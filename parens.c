@@ -79,12 +79,10 @@ Node* parse_char(char c, Node* node) {
         node->status = StatusOpeningParens;
         return node;
     } else if (c == '(' && node->status == StatusOpeningParens) {
-        Node child = {
-            .status = StatusOpeningParens, .children = NULL, .child_count = 0};
+        Node child = {.status = StatusOpeningParens};
         return node_add_child(node, &child);
     } else if (c == '(' && node->status == StatusPairParens) {
-        Node sibling = {
-            .status = StatusOpeningParens, .children = NULL, .child_count = 0};
+        Node sibling = {.status = StatusOpeningParens};
         return node_add_sibling(node, &sibling);
     } else if (c == ')' && node->status == StatusOpeningParens) {
         node->status = StatusPairParens;
@@ -122,11 +120,11 @@ bool node_has_status(Node const* node, Status status) {
 
 bool is_parens_expr_valid(char* str) {
     Node* root = node_make();
-    Node child1 = {.status = StatusUnknown, .children = NULL, .child_count = 0};
+    Node child1 = {.status = StatusUnknown};
     parse_string(str, node_add_child(root, &child1));
     node_print(root);
 
-    bool is_valid = node_has_status(root, StatusInvalid);
+    bool is_valid = !node_has_status(root, StatusInvalid);
 
     node_free(root);
 
@@ -134,7 +132,6 @@ bool is_parens_expr_valid(char* str) {
 }
 
 int main(int argc, char* argv[]) {
-    printf("%d", sizeof(Status));
     if (argc != 2) return 1;
 
     return !is_parens_expr_valid(argv[1]);

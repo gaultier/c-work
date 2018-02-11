@@ -2,4 +2,4 @@ cflags = -Weverything
 rule cc
   command = gcc $cflags $in -o $out
 
-build parens: cc parens.c
+build build/parens: cc parens.c
