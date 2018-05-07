@@ -22,6 +22,6 @@ build build/debug/house: cc_debug house.c
 build build/release/house: cc_release house.c
 build build/bench/house: cc_bench house.c
 
-build build/debug/gen_points: cc_debug gen_points.c
-build build/release/gen_points: cc_release gen_points.c
-build build/bench/gen_points: cc_bench gen_points.c
+build build/debug/dict: cc_debug dict.c
+build build/release/dict: cc_release dict.c
+build build/bench/dict: cc_bench dict.c
