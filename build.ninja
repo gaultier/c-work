@@ -1,5 +1,27 @@
-cflags = -Weverything
-rule cc
-  command = gcc $cflags $in -o $out
+cflags_debug = -Weverything -g -O0
+cflags_release = -Weverything -O2
+cflags_bench = -Weverything -O2 -g
 
-build build/parens: cc parens.c
+rule cc_debug
+  command = gcc $cflags_debug $in -o $out
+
+rule cc_release
+  command = gcc $cflags_release $in -o $out
+
+rule cc_bench
+  command = gcc $cflags_bench $in -o $out
+
+rule cc_clean
+  command = rm -r $dir
+
+build build/debug/parens: cc_debug parens.c
+build build/release/parens: cc_release parens.c
+build build/bench/parens: cc_bench parens.c
+
+build build/debug/house: cc_debug house.c
+build build/release/house: cc_release house.c
+build build/bench/house: cc_bench house.c
+
+build build/debug/gen_points: cc_debug gen_points.c
+build build/release/gen_points: cc_release gen_points.c
+build build/bench/gen_points: cc_bench gen_points.c
