@@ -38,28 +38,34 @@ int main(int argc, const char* argv[]) {
 
     for (int i = 1; i < r; i++) {
         jsmntok_t token = tok[i];
-        printf("[%i]: type=%u, start=%u, end=%u, size=%u\n", i, token.type,
-               token.start, token.end, token.size);
+        // printf("[%i]: type=%u, start=%u, end=%u, size=%u\n", i, token.type,
+        //      token.start, token.end, token.size);
+
+        char buf[100] = "";
+        char* start = &content[token.start];
+        uint64_t token_length = (uint64_t)(token.end - token.start + 1);
+        strlcpy(buf, start, MIN(token_length, 100));
+
         if (token.type == JSMN_PRIMITIVE) {
-            char buf[100] = "";
-            char* start = &content[token.start];
-            uint64_t token_length = (uint64_t)(token.end - token.start + 1);
-            strlcpy(buf, start, MIN(token_length, 100));
-            double primitive = strtod(buf, NULL);
-            if (primitive == 0)
-                fprintf(stderr,
-                        "Could not convert primitive to double: `%s` is not a "
-                        "number\n",
-                        buf);
-            else if (primitive == HUGE_VAL || primitive == -HUGE_VAL)
-                fprintf(stderr,
-                        "Could not convert primitive to double, would "
-                        "overflow: %s errno=%d "
-                        "(input was `%s`)\n",
-                        strerror(errno), errno, buf);
-            else
-                printf("Primitive: %f\n", primitive);
-        }
+            if (buf[0] == 'f')
+                printf("\tfalse\n");
+            else if (buf[0] == 't')
+                printf("\ttrue\n");
+            else if (buf[0] == 'n')
+                printf("\tnull\n");
+            else {
+                double primitive = strtod(buf, NULL);
+                if (primitive == HUGE_VAL || primitive == -HUGE_VAL)
+                    fprintf(stderr,
+                            "Could not convert primitive to double, would "
+                            "overflow: %s errno=%d "
+                            "(input was `%s`)\n",
+                            strerror(errno), errno, buf);
+                else
+                    printf("\t%f\n", primitive);
+            }
+        } else if (token.type == JSMN_STRING)
+            printf("\t'%s'\n", buf);
     }
     return 0;
 }
