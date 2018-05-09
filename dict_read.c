@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include "utils.h"
 
 typedef struct {
     const uint32_t str_i : 24, size : 8;
@@ -18,34 +19,11 @@ typedef struct {
     String strings[];
 } Strings;
 
-int readFile(const char file_name[], char** str, uint64_t* size) {
-    const int fd = open(file_name, O_RDONLY);
-    if (fd == -1) {
-        fprintf(stderr, "Error opening file: %s", strerror(errno));
-        return -1;
-    }
-
-    struct stat s;
-    const int res = fstat(fd, &s);
-    if (res == -1) {
-        fprintf(stderr, "Error fstat : %s\n", strerror(errno));
-        return -1;
-    }
-
-    *size = s.st_size;
-    *str = mmap(NULL, *size, PROT_READ, MAP_FILE | MAP_PRIVATE, fd, 0);
-    if (*str == MAP_FAILED) {
-        fprintf(stderr, "Error mmapping file: %s\n", strerror(errno));
-        return -1;
-    }
-
-    return 0;
-}
-
-int main() {
+int main(int argc, const char* argv[]) {
+    if (argc != 2) return 0;
     char* content;
     uint64_t size;
-    int res = readFile("dict", &content, &size);
+    int res = readFile(argv[1], &content, &size);
     if (res == -1) {
         fprintf(stderr, "[1] Error reading file: %s\n", strerror(errno));
         exit(1);
