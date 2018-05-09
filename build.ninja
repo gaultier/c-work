@@ -14,10 +14,10 @@ rule cc_release
   command = gcc $cflags_release $in -o $out
 
 rule link_debug
-  command = gcc $cflags_debug $in -o $out
+  command = gcc $cflags_debug $ldflags $in -o $out
 
 rule link_release
-  command = gcc $cflags_release $in -o $out
+  command = gcc $cflags_release $ldflags $in -o $out
 
 build build/debug/parens: cc_debug parens.c
 build build/release/parens: cc_release parens.c
@@ -40,6 +40,7 @@ build build/debug/utils.o: cc_o_debug utils.c
 build build/release/utils.o: cc_o_release utils.c
 
 build build/debug/airplane.o: cc_o_debug airplane.c
-build build/debug/airplane: link_debug build/debug/airplane.o build/debug/utils.o
+build build/debug/airplane: link_debug build/debug/airplane.o build/debug/utils.o libjsmn.a 
 build build/release/airplane.o: cc_o_release airplane.c
-build build/release/airplane: link_release build/release/airplane.o build/release/utils.o
+build build/release/airplane: link_release build/release/airplane.o build/release/utils.o libjsmn.a
+
