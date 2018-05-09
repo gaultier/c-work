@@ -1,5 +1,5 @@
-cflags_debug = -Weverything -g -O0
-cflags_release = -Weverything -O2
+cflags_debug = -Weverything -g -O0 -std=c99
+cflags_release = -Weverything -O2 -std=c99
 
 rule cc_o_debug
   command = gcc $cflags_debug -c $in -o $out
