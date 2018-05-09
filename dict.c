@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include "utils.h"
 
 typedef struct BNode BNode;
 struct BNode {
@@ -36,7 +37,6 @@ typedef struct {
     String strings[];
 } Strings;
 
-int readFile(const char file_name[], char** str, uint64_t* size);
 int8_t cmp(const char s1[], uint8_t size1, const char s2[], uint8_t size2);
 void bnode_insert(uint32_t parent_i, const char value[], uint8_t size,
                   uint32_t new_node_i, BNode nodes[]);
@@ -50,30 +50,6 @@ const char* word_find_divide(const String words[], uint32_t words_size,
                              const char* content);
 const char* word_find_memcmp(char* content, uint64_t count, const char* word,
                              uint8_t word_size);
-
-int readFile(const char file_name[], char** str, uint64_t* size) {
-    const int fd = open(file_name, O_RDONLY);
-    if (fd == -1) {
-        fprintf(stderr, "Error opening file: %s", strerror(errno));
-        return -1;
-    }
-
-    struct stat s;
-    const int res = fstat(fd, &s);
-    if (res == -1) {
-        fprintf(stderr, "Error fstat : %s\n", strerror(errno));
-        return -1;
-    }
-
-    *size = s.st_size;
-    *str = mmap(NULL, *size, PROT_READ, MAP_FILE | MAP_PRIVATE, fd, 0);
-    if (*str == MAP_FAILED) {
-        fprintf(stderr, "Error mmapping file: %s\n", strerror(errno));
-        return -1;
-    }
-
-    return 0;
-}
 
 inline int8_t cmp(const char s1[], uint8_t size1, const char s2[],
                   uint8_t size2) {

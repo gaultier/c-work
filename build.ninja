@@ -25,8 +25,11 @@ build build/release/parens: cc_release parens.c
 build build/debug/house: cc_debug house.c
 build build/release/house: cc_release house.c
 
-build build/debug/dict: cc_debug dict.c
-build build/release/dict: cc_release dict.c
+build build/debug/dict.o: cc_o_debug dict.c
+build build/debug/dict: link_debug build/debug/dict.o build/debug/utils.o
+
+build build/release/dict.o: cc_o_release dict.c
+build build/release/dict: link_release build/release/dict.o build/release/utils.o
 
 build build/debug/utils.o: cc_o_debug utils.c
 build build/release/utils.o: cc_o_release utils.c
