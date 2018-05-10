@@ -51,28 +51,27 @@ int main(int argc, const char* argv[]) {
     if (argc != 2) return 0;
     char* content;
     uint64_t size;
-    int r = readFile(argv[1], &content, &size);
-    if (r == -1) return 1;
+    int read_result = readFile(argv[1], &content, &size);
+    if (read_result == -1) return 1;
 
     printf("Size: %llu\n", size);
 
     jsmn_parser p;
     jsmn_init(&p);
-    const uint32_t tok_count = 1000;
-    jsmntok_t* tok = calloc(sizeof(jsmntok_t), tok_count);
+    const uint32_t tok_expect = 1000;
+    jsmntok_t* tok = calloc(sizeof(jsmntok_t), tok_expect);
 
-    r = jsmn_parse(&p, content, size, tok, tok_count);
-    if (r < 0) {
-        fprintf(stderr, "Failed parsing: %d\n", r);
+    int tok_count = jsmn_parse(&p, content, size, tok, tok_expect);
+    if (tok_count < 0) {
+        fprintf(stderr, "Failed parsing: %d\n", tok_count);
         return 1;
     }
 
-    /* Assume the top-level element is an object */
-    if (r < 1 || tok[0].type != JSMN_OBJECT) {
+    if (tok_count < 1 || tok[0].type != JSMN_OBJECT) {
         fprintf(stderr, "Object expected\n");
         return 1;
     }
-    printf("Found %d tokens\n", r);
+    printf("Found %d tokens\n", tok_count);
 
     if (tok[1].type != JSMN_STRING ||
         !str_eq(content, tok[1].start, tok[1].end, "timestamp")) {
@@ -108,20 +107,28 @@ int main(int argc, const char* argv[]) {
                 tok[4].type, tok[4].size);
         return 1;
     }
-    printf("non empty array found : type=%d size=%d\n", tok[4].type,
-           tok[4].size);
+    printf("%d states\n", tok[4].size);
 
-    // for (int i = 3; i < r; i++) {
-    //    jsmntok_t token = tok[i];
-    //    // printf("[%i]: type=%u, start=%u, end=%u, size=%u\n", i,
-    //    token.type,
-    //    //      token.start, token.end, token.size);
+    for (int i = 5; i < tok_count; i += 18) {
+        if (tok[i].type != JSMN_ARRAY) {
+            fprintf(stderr, "Expected array, got type=%d\n", tok[i].type);
+            return 1;
+        } else if (tok[i].size != 17) {
+            fprintf(stderr, "Unexpected array size: %d != 17\n", tok[i].size);
+            return 1;
+        }
 
-    //    char buf[100] = "";
-    //    char* start = &content[token.start];
-    //    uint64_t token_length = (token.end - token.start);
-    //    strlcpy(buf, start, MIN(token_length, 100));
-
+        printf("[%d] State %d:\n", i, (i - 5) / 18 + 1);
+        for (int j = i + 1; j <= i + 17; j++) {
+            if (tok[j].type != JSMN_PRIMITIVE && tok[j].type != JSMN_STRING) {
+                fprintf(stderr, "Expected primitive or string, got type=%d\n",
+                        tok[j].type);
+            }
+            printf("\t- ");
+            str_fprintf(stdout, content, tok[j].start, tok[j].end);
+            printf("\n");
+        }
+    }
     //    if (token.type == JSMN_PRIMITIVE) {
     //        if (buf[0] == 'f')
     //            printf("\tfalse\n");
@@ -140,11 +147,5 @@ int main(int argc, const char* argv[]) {
     //            else
     //                printf("\t%f\n", primitive);
     //        }
-    //    } else if (token.type == JSMN_STRING)
-    //        printf("\t'%s'\n", buf);
-    //    else if (token.type == JSMN_ARRAY) {
-    //        printf("array[%u]\n", token.size);
-    //    }
-    //}
     return 0;
 }
