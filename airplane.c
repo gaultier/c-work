@@ -10,27 +10,41 @@
 #include "math.h"
 #include "utils.h"
 
-bool str_eq(const char* content, uint64_t start, uint64_t end, char* s);
-bool str_numerical(const char* content, uint64_t start, uint64_t end);
-void str_fprintf(FILE* fd, const char* content, uint64_t start, uint64_t end);
+bool str_eq(const char* content, int start, int end, char* s);
+bool str_numerical(const char* content, int start, int end);
+void str_fprintf(FILE* fd, const char* content, int start, int end);
+uint64_t str_to_uint64(const char* content, int start, int end);
 
-bool str_eq(const char* content, uint64_t start, uint64_t end, char* s) {
-    uint64_t token_length = (uint64_t)(end - start);
-    return memcmp(s, &content[start], token_length) == 0;
+bool str_eq(const char* content, int start, int end, char* s) {
+    return memcmp(s, &content[start], (uint64_t)(end - start)) == 0;
 }
 
-void str_fprintf(FILE* fd, const char* content, uint64_t start, uint64_t end) {
-    for (uint64_t i = start; i < end; i++) fprintf(fd, "%c", content[i]);
+void str_fprintf(FILE* fd, const char* content, int start, int end) {
+    for (int64_t i = start; i < end; i++) fprintf(fd, "%c", content[i]);
 }
 
-bool str_numerical(const char* content, uint64_t start, uint64_t end) {
-    for (uint64_t i = start; i < end; i++) {
+bool str_numerical(const char* content, int start, int end) {
+    for (int64_t i = start; i < end; i++) {
         if (content[i] < '0' || content[i] > '9') {
-            printf("\t%c is not numerical\n", content[i]);
             return false;
         }
     }
     return true;
+}
+
+uint64_t str_to_uint64(const char* content, int start, int end) {
+    int token_length = (end - start);
+    char buf[token_length];
+    memcpy(buf, &content[start], token_length);
+    buf[token_length] = '\0';
+    uint64_t num = strtoull(buf, NULL, 10);
+    if (num == 0 || num == ULLONG_MAX) {
+        fprintf(stderr,
+                "Could not convert primitive to uint64_t: %s errno=%d "
+                "(input was `%s`)\n",
+                strerror(errno), errno, buf);
+    }
+    return num;
 }
 
 int main(int argc, const char* argv[]) {
@@ -61,37 +75,23 @@ int main(int argc, const char* argv[]) {
     printf("Found %d tokens\n", r);
 
     if (tok[1].type != JSMN_STRING ||
-        !str_eq(content, (uint64_t)tok[1].start, (uint64_t)tok[1].end,
-                "timestamp")) {
+        !str_eq(content, tok[1].start, tok[1].end, "timestamp")) {
         fprintf(stderr, "`timestamp` expected, found `");
-        str_fprintf(stderr, content, (uint64_t)tok[1].start,
-                    (uint64_t)tok[1].end);
+        str_fprintf(stderr, content, tok[1].start, tok[1].end);
         fprintf(stderr, "`\n");
 
         return 1;
     }
 
     if (tok[2].type != JSMN_PRIMITIVE ||
-        !str_numerical(content, (uint64_t)tok[2].start, (uint64_t)tok[2].end)) {
+        !str_numerical(content, tok[2].start, tok[2].end)) {
         fprintf(stderr, "unix timestamp expected, found `");
-        str_fprintf(stderr, content, (uint64_t)tok[2].start,
-                    (uint64_t)tok[2].end);
+        str_fprintf(stderr, content, tok[2].start, tok[2].end);
         fprintf(stderr, "`\n");
 
         return 1;
     }
-    uint64_t token_length = (uint64_t)(tok[2].end - tok[2].start);
-    char buf[token_length];
-    char* start = &content[tok[2].start];
-    memcpy(buf, start, token_length);
-    buf[token_length] = '\0';
-    uint64_t timestamp = strtoull(buf, NULL, 10);
-    if (timestamp == 0 || timestamp == ULLONG_MAX) {
-        fprintf(stderr,
-                "Could not convert primitive to uint64_t: %s errno=%d "
-                "(input was `%s`)\n",
-                strerror(errno), errno, buf);
-    }
+    const uint64_t timestamp = str_to_uint64(content, tok[2].start, tok[2].end);
     printf("Timestamp=%llu\n", timestamp);
 
     // for (int i = 3; i < r; i++) {
@@ -102,7 +102,7 @@ int main(int argc, const char* argv[]) {
 
     //    char buf[100] = "";
     //    char* start = &content[token.start];
-    //    uint64_t token_length = (uint64_t)(token.end - token.start);
+    //    uint64_t token_length = (token.end - token.start);
     //    strlcpy(buf, start, MIN(token_length, 100));
 
     //    if (token.type == JSMN_PRIMITIVE) {
