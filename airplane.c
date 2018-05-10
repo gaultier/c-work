@@ -51,19 +51,26 @@ int main(int argc, const char* argv[]) {
     if (argc != 2) return 0;
     char* content;
     uint64_t size;
-    int read_result = readFile(argv[1], &content, &size);
+    const int read_result = readFile(argv[1], &content, &size);
     if (read_result == -1) return 1;
 
     printf("Size: %llu\n", size);
 
     jsmn_parser p;
     jsmn_init(&p);
-    const uint32_t tok_expect = 1000;
+    // Simple heuristic: JSON contains fewer tokens than bytes
+    const uint32_t tok_expect = (uint32_t)size;
     jsmntok_t* tok = calloc(sizeof(jsmntok_t), tok_expect);
 
-    int tok_count = jsmn_parse(&p, content, size, tok, tok_expect);
+    const int tok_count = jsmn_parse(&p, content, size, tok, tok_expect);
     if (tok_count < 0) {
-        fprintf(stderr, "Failed parsing: %d\n", tok_count);
+        fprintf(stderr, "Failed parsing: ret=%d, msg=%s\n", tok_count,
+                tok_count == JSMN_ERROR_INVAL
+                    ? "JSMN_ERROR_INVAL"
+                    : tok_count == JSMN_ERROR_NOMEM
+                          ? "JSMN_ERROR_NOMEM"
+                          : tok_count == JSMN_ERROR_PART ? "JSMN_ERROR_PART"
+                                                         : "Unknown error");
         return 1;
     }
 
@@ -71,6 +78,7 @@ int main(int argc, const char* argv[]) {
         fprintf(stderr, "Object expected\n");
         return 1;
     }
+
     printf("Found %d tokens\n", tok_count);
 
     if (tok[1].type != JSMN_STRING ||
@@ -78,7 +86,6 @@ int main(int argc, const char* argv[]) {
         fprintf(stderr, "`timestamp` expected, found `");
         str_fprintf(stderr, content, tok[1].start, tok[1].end);
         fprintf(stderr, "`\n");
-
         return 1;
     }
 
@@ -87,9 +94,9 @@ int main(int argc, const char* argv[]) {
         fprintf(stderr, "unix timestamp expected, found `");
         str_fprintf(stderr, content, tok[2].start, tok[2].end);
         fprintf(stderr, "`\n");
-
         return 1;
     }
+
     const uint64_t timestamp = str_to_uint64(content, tok[2].start, tok[2].end);
     printf("Timestamp=%llu\n", timestamp);
 
@@ -98,7 +105,6 @@ int main(int argc, const char* argv[]) {
         fprintf(stderr, "`states` expected, found `");
         str_fprintf(stderr, content, tok[3].start, tok[3].end);
         fprintf(stderr, "`\n");
-
         return 1;
     }
 
@@ -119,6 +125,7 @@ int main(int argc, const char* argv[]) {
         }
 
         printf("[%d] State %d:\n", i, (i - 5) / 18 + 1);
+
         for (int j = i + 1; j <= i + 17; j++) {
             if (tok[j].type != JSMN_PRIMITIVE && tok[j].type != JSMN_STRING) {
                 fprintf(stderr, "Expected primitive or string, got type=%d\n",
