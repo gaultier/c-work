@@ -93,6 +93,14 @@ int main(int argc, const char* argv[]) {
     }
     const uint64_t timestamp = str_to_uint64(content, tok[2].start, tok[2].end);
     printf("Timestamp=%llu\n", timestamp);
+    if (tok[3].type != JSMN_STRING ||
+        !str_eq(content, tok[3].start, tok[3].end, "states")) {
+        fprintf(stderr, "`states` expected, found `");
+        str_fprintf(stderr, content, tok[3].start, tok[3].end);
+        fprintf(stderr, "`\n");
+
+        return 1;
+    }
 
     // for (int i = 3; i < r; i++) {
     //    jsmntok_t token = tok[i];
