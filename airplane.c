@@ -93,6 +93,7 @@ int main(int argc, const char* argv[]) {
     }
     const uint64_t timestamp = str_to_uint64(content, tok[2].start, tok[2].end);
     printf("Timestamp=%llu\n", timestamp);
+
     if (tok[3].type != JSMN_STRING ||
         !str_eq(content, tok[3].start, tok[3].end, "states")) {
         fprintf(stderr, "`states` expected, found `");
@@ -101,6 +102,14 @@ int main(int argc, const char* argv[]) {
 
         return 1;
     }
+
+    if (tok[4].type != JSMN_ARRAY || tok[4].size == 0) {
+        fprintf(stderr, "non empty array expected, found type=%d size=%d\n",
+                tok[4].type, tok[4].size);
+        return 1;
+    }
+    printf("non empty array found : type=%d size=%d\n", tok[4].type,
+           tok[4].size);
 
     // for (int i = 3; i < r; i++) {
     //    jsmntok_t token = tok[i];
