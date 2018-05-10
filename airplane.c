@@ -10,13 +10,14 @@
 #include "math.h"
 #include "utils.h"
 
-bool str_eq(const char* content, int start, int end, char* s);
+bool str_eq(const char* content, int start, int end, char* s, uint64_t s_len);
 bool str_numerical(const char* content, int start, int end);
 void str_fprintf(FILE* fd, const char* content, int start, int end);
 uint64_t str_to_uint64(const char* content, int start, int end);
 
-bool str_eq(const char* content, int start, int end, char* s) {
-    return memcmp(s, &content[start], (uint64_t)(end - start)) == 0;
+bool str_eq(const char* content, int start, int end, char* s, uint64_t s_len) {
+    return (uint64_t)(end - start) == s_len &&
+           memcmp(s, &content[start], (uint64_t)(end - start)) == 0;
 }
 
 void str_fprintf(FILE* fd, const char* content, int start, int end) {
@@ -75,15 +76,20 @@ int main(int argc, const char* argv[]) {
     }
 
     if (tok_count < 1 || tok[0].type != JSMN_OBJECT) {
-        fprintf(stderr, "Object expected\n");
+        fprintf(stderr, "[0] Object expected, got type=%d\n", tok[0].type);
+        return 1;
+    }
+    if (tok[0].size == 0) {
+        fprintf(stderr, "[0] Empty object, got size=%d\n", tok[0].size);
         return 1;
     }
 
     printf("Found %d tokens\n", tok_count);
 
     if (tok[1].type != JSMN_STRING ||
-        !str_eq(content, tok[1].start, tok[1].end, "timestamp")) {
-        fprintf(stderr, "`timestamp` expected, found `");
+        !str_eq(content, tok[1].start, tok[1].end, "timestamp",
+                strlen("timestamp"))) {
+        fprintf(stderr, "[1] `timestamp` expected, found `");
         str_fprintf(stderr, content, tok[1].start, tok[1].end);
         fprintf(stderr, "`\n");
         return 1;
@@ -91,7 +97,7 @@ int main(int argc, const char* argv[]) {
 
     if (tok[2].type != JSMN_PRIMITIVE ||
         !str_numerical(content, tok[2].start, tok[2].end)) {
-        fprintf(stderr, "unix timestamp expected, found `");
+        fprintf(stderr, "[2] unix timestamp expected, found `");
         str_fprintf(stderr, content, tok[2].start, tok[2].end);
         fprintf(stderr, "`\n");
         return 1;
@@ -100,16 +106,16 @@ int main(int argc, const char* argv[]) {
     const uint64_t timestamp = str_to_uint64(content, tok[2].start, tok[2].end);
     printf("Timestamp=%llu\n", timestamp);
 
-    if (tok[3].type != JSMN_STRING ||
-        !str_eq(content, tok[3].start, tok[3].end, "states")) {
-        fprintf(stderr, "`states` expected, found `");
+    if (tok[3].type != JSMN_STRING || !str_eq(content, tok[3].start, tok[3].end,
+                                              "states", strlen("states"))) {
+        fprintf(stderr, "[3] `states` expected, found `");
         str_fprintf(stderr, content, tok[3].start, tok[3].end);
         fprintf(stderr, "`\n");
         return 1;
     }
 
     if (tok[4].type != JSMN_ARRAY || tok[4].size == 0) {
-        fprintf(stderr, "non empty array expected, found type=%d size=%d\n",
+        fprintf(stderr, "[4] non empty array expected, found type=%d size=%d\n",
                 tok[4].type, tok[4].size);
         return 1;
     }
@@ -117,10 +123,12 @@ int main(int argc, const char* argv[]) {
 
     for (int i = 5; i < tok_count; i += 18) {
         if (tok[i].type != JSMN_ARRAY) {
-            fprintf(stderr, "Expected array, got type=%d\n", tok[i].type);
+            fprintf(stderr, "[%d] Expected array, got type=%d\n", i,
+                    tok[i].type);
             return 1;
         } else if (tok[i].size != 17) {
-            fprintf(stderr, "Unexpected array size: %d != 17\n", tok[i].size);
+            fprintf(stderr, "[%d] Unexpected array size: %d != 17\n", i,
+                    tok[i].size);
             return 1;
         }
 
@@ -128,7 +136,8 @@ int main(int argc, const char* argv[]) {
 
         for (int j = i + 1; j <= i + 17; j++) {
             if (tok[j].type != JSMN_PRIMITIVE && tok[j].type != JSMN_STRING) {
-                fprintf(stderr, "Expected primitive or string, got type=%d\n",
+                fprintf(stderr,
+                        "[%d] Expected primitive or string, got type=%d\n", i,
                         tok[j].type);
             }
             printf("\t- ");
