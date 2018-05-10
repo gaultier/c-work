@@ -137,8 +137,9 @@ int main(int argc, const char* argv[]) {
         for (int j = i + 1; j <= i + 17; j++) {
             if (tok[j].type != JSMN_PRIMITIVE && tok[j].type != JSMN_STRING) {
                 fprintf(stderr,
-                        "[%d] Expected primitive or string, got type=%d\n", i,
-                        tok[j].type);
+                        "[%d][%d] Expected primitive or string, got type=%d\n",
+                        i, j, tok[j].type);
+                return 1;
             }
             printf("\t- ");
             str_fprintf(stdout, content, tok[j].start, tok[j].end);
