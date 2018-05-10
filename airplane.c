@@ -14,6 +14,7 @@ bool str_eq(const char* content, int start, int end, char* s, uint64_t s_len);
 bool str_numerical(const char* content, int start, int end);
 void str_fprintf(FILE* fd, const char* content, int start, int end);
 uint64_t str_to_uint64(const char* content, int start, int end);
+double str_to_double(const char* content, int start, int end);
 
 bool str_eq(const char* content, int start, int end, char* s, uint64_t s_len) {
     return (uint64_t)(end - start) == s_len &&
@@ -39,12 +40,27 @@ uint64_t str_to_uint64(const char* content, int start, int end) {
     memcpy(buf, &content[start], token_length);
     buf[token_length] = '\0';
     uint64_t num = strtoull(buf, NULL, 10);
-    if (num == 0 || num == ULLONG_MAX) {
+    if (num == 0 || num == ULLONG_MAX)
         fprintf(stderr,
                 "Could not convert primitive to uint64_t: %s errno=%d "
                 "(input was `%s`)\n",
                 strerror(errno), errno, buf);
-    }
+
+    return num;
+}
+
+double str_to_double(const char* content, int start, int end) {
+    int token_length = (end - start);
+    char buf[token_length];
+    memcpy(buf, &content[start], token_length);
+    buf[token_length] = '\0';
+    double num = strtod(buf, NULL);
+    if (num == HUGE_VAL || num == -HUGE_VAL)
+        fprintf(stderr,
+                "Could not convert primitive to double: %s errno=%d "
+                "(input was `%s`)\n",
+                strerror(errno), errno, buf);
+
     return num;
 }
 
@@ -145,6 +161,17 @@ int main(int argc, const char* argv[]) {
             str_fprintf(stdout, content, tok[j].start, tok[j].end);
             printf("\n");
         }
+        double latitude =
+            str_to_double(content, tok[i + 6].start, tok[i + 6].end);
+        double longitude =
+            str_to_double(content, tok[i + 7].start, tok[i + 7].end);
+        double altitude =
+            str_to_double(content, tok[i + 8].start, tok[i + 8].end);
+        printf("***lat=%f\n", latitude);
+        printf("***long=%f\n", longitude);
+        printf("***alt=%f\n", altitude);
+        // double latitude = str_to_double(content,  tok[j].start, tok[j].end);
+        // double latitude = str_to_double(content,  tok[j].start, tok[j].end);
     }
     //    if (token.type == JSMN_PRIMITIVE) {
     //        if (buf[0] == 'f')
@@ -154,13 +181,6 @@ int main(int argc, const char* argv[]) {
     //        else if (buf[0] == 'n')
     //            printf("\tnull\n");
     //        else {
-    //            double primitive = strtod(buf, NULL);
-    //            if (primitive == HUGE_VAL || primitive == -HUGE_VAL)
-    //                fprintf(stderr,
-    //                        "Could not convert primitive to double, would
-    //                        " "overflow: %s errno=%d "
-    //                        "(input was `%s`)\n",
-    //                        strerror(errno), errno, buf);
     //            else
     //                printf("\t%f\n", primitive);
     //        }
