@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <float.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -15,6 +16,7 @@ bool str_numerical(const char* content, int start, int end);
 void str_fprintf(FILE* fd, const char* content, int start, int end);
 uint64_t str_to_uint64(const char* content, int start, int end);
 double str_to_double(const char* content, int start, int end);
+double dist_squared(double x1, double y1, double x2, double y2);
 
 bool str_eq(const char* content, int start, int end, char* s, uint64_t s_len) {
     return (uint64_t)(end - start) == s_len &&
@@ -64,8 +66,24 @@ double str_to_double(const char* content, int start, int end) {
     return num;
 }
 
+double dist_squared(double x1, double y1, double x2, double y2) {
+    return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+}
+
 int main(int argc, const char* argv[]) {
-    if (argc != 2) return 0;
+    if (argc != 4) return 0;
+    const double argv_latitude = M_PI * strtod(argv[2], NULL) / 180;
+    const double argv_longitude = M_PI * strtod(argv[3], NULL) / 180;
+    const uint64_t earth_radius = 6371000;
+    const double argv_thetha = argv_longitude;
+    const double argv_phi = M_PI - argv_latitude;
+
+    double argv_x = earth_radius * sin(argv_thetha) * cos(argv_phi);
+    double argv_y = earth_radius * sin(argv_thetha) * sin(argv_phi);
+    double argv_z = earth_radius * cos(argv_thetha);
+    printf("Lat=%f Lng=%f X=%f Y=%f Z=%f\n", argv_latitude, argv_longitude,
+           argv_x, argv_y, argv_z);
+
     char* content;
     uint64_t size;
     const int read_result = readFile(argv[1], &content, &size);
@@ -137,6 +155,9 @@ int main(int argc, const char* argv[]) {
     }
     printf("%d states\n", tok[4].size);
 
+    double min_dist_sq = DBL_MAX;
+    jsmntok_t* best = NULL;
+
     for (int i = 5; i < tok_count; i += 18) {
         if (tok[i].type != JSMN_ARRAY) {
             fprintf(stderr, "[%d] Expected array, got type=%d\n", i,
@@ -167,22 +188,19 @@ int main(int argc, const char* argv[]) {
             str_to_double(content, tok[i + 7].start, tok[i + 7].end);
         double altitude =
             str_to_double(content, tok[i + 8].start, tok[i + 8].end);
-        printf("***lat=%f\n", latitude);
-        printf("***long=%f\n", longitude);
-        printf("***alt=%f\n", altitude);
-        // double latitude = str_to_double(content,  tok[j].start, tok[j].end);
-        // double latitude = str_to_double(content,  tok[j].start, tok[j].end);
+        double x = (earth_radius + altitude) * cos(longitude);
+        double y = (earth_radius + altitude) * sin(latitude);
+
+        printf("Lat=%f Lng=%f Alt=%f X=%f Y=%f\n", latitude, longitude,
+               altitude, x, y);
+        double dist_sq = dist_squared(x, y, argv_x, argv_y);
+        if (dist_sq < min_dist_sq) {
+            min_dist_sq = dist_sq;
+            best = &tok[i + 1];
+        }
     }
-    //    if (token.type == JSMN_PRIMITIVE) {
-    //        if (buf[0] == 'f')
-    //            printf("\tfalse\n");
-    //        else if (buf[0] == 't')
-    //            printf("\ttrue\n");
-    //        else if (buf[0] == 'n')
-    //            printf("\tnull\n");
-    //        else {
-    //            else
-    //                printf("\t%f\n", primitive);
-    //        }
+    printf("Best: %f\n", min_dist_sq);
+    str_fprintf(stdout, content, best->start, best->end);
+
     return 0;
 }
