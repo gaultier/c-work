@@ -77,40 +77,26 @@ int main(int argc, const char* argv[]) {
     skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
     char longitude_str[100] = "";
-    record_to_before_next(&current, '"', (uint64_t)(end - current),
+    record_to_before_next(&current, ',', (uint64_t)(end - current),
                           longitude_str);
     double longitude = strtod(longitude_str, NULL);
-    printf("Lng: %f\n", longitude);
+    printf("longitude: %f\n", longitude);
+    skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
-    // current = memchr(current, ',', current - content) + 1;
-    // current = memchr(current, ',', current - content) + 1;
+    char latitude_str[100] = "";
+    record_to_before_next(&current, ',', (uint64_t)(end - current),
+                          latitude_str);
+    double latitude = strtod(latitude_str, NULL);
+    printf("latitude: %f\n", latitude);
+    skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
-    // char* longitude_end = memchr(current, ',', current - content) - 1;
-    // char longitude_str[100] = "";
-    // memcpy(longitude_str, current, longitude_(uint64_t)(end - current));
-    // double longitude = strtod(longitude_str, NULL);
-    // printf("Lng: %f\n", longitude);
-    // current = longitude_end + 2;
+    char altitude_str[100] = "";
+    record_to_before_next(&current, ',', (uint64_t)(end - current),
+                          altitude_str);
+    double altitude = strtod(altitude_str, NULL);
+    printf("altitude: %f\n", altitude);
+    skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
-    // char* latitude_end = memchr(current, ',', current - content) - 1;
-    // char latitude_str[100] = "";
-    // memcpy(latitude_str, current, latitude_(uint64_t)(end - current));
-    // double latitude = strtod(latitude_str, NULL);
-    // printf("Lat: %f\n", latitude);
-    // current = latitude_end + 2;
-
-    // char* altitude_end = memchr(current, ',', current - content) - 1;
-    // char altitude_str[100] = "";
-    // memcpy(altitude_str, current, altitude_(uint64_t)(end - current));
-    // double altitude = strtod(altitude_str, NULL);
-    // printf("Alt: %f\n", altitude);
-    // current = altitude_end + 2;
-
-    // printf("current: %c (%llu)\n", *current, current - content);
-
-    // char* end = memchr(current, ']', size - current_i);
-    // uint64_t end_i = end - content;
-    // printf("End: %c (%llu)\n", *end, end_i);
-
+    // printf("current: %c %ld\n", *current, end - current);
     return 0;
 }
