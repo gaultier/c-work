@@ -45,9 +45,12 @@ typedef struct {
 
 size_t curl_cb(void* content, size_t size, size_t nmemb, void* userp) {
     uint64_t real_size = size * nmemb;
-    printf("Real size: %d\n", real_size);
     Json* json = (Json*)userp;
     json->data = realloc(json->data, json->size + real_size + 1);
+    if (!json->data) {
+        printf("Out of memory\n");
+        exit(1);
+    }
     memcpy(&(json->data[json->size]), content, real_size);
 
     json->size += real_size;
@@ -77,10 +80,12 @@ int main(int argc, const char* argv[]) {
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
             fprintf(stderr, "curl failed: %s\n", curl_easy_strerror(res));
+            curl_easy_cleanup(curl);
+            return 1;
         }
         curl_easy_cleanup(curl);
     }
-    printf("JSON: %s\n", json.data);
+
     char* end = json.data + json.size;
     char* current = json.data;
 
