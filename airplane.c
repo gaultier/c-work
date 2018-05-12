@@ -52,51 +52,54 @@ int main(int argc, const char* argv[]) {
     if (read_result == -1) return 1;
     char* end = content + size;
     printf("Size: %llu\n", size);
-
     char* current = content;
-    skip_to_next(&current, '[', size);
-    skip_to_after_next(&current, '"', (uint64_t)(end - current));
-    char ico[7] = "";
-    record_to_before_next(&current, '"', (uint64_t)(end - current), ico);
-    printf("***%s***\n", ico);
-    skip_to_after_next(&current, '"', (uint64_t)(end - current));
-    skip_to_after_next(&current, '"', (uint64_t)(end - current));
 
-    char callsign[9] = "";
-    record_to_before_next(&current, '"', (uint64_t)(end - current), callsign);
-    printf("***%s***\n", callsign);
+    while (current < end) {
+        skip_to_next(&current, '[', size);
+        if (!current) break;
 
-    skip_to_after_next(&current, '"', (uint64_t)(end - current));
-    skip_to_after_next(&current, '"', (uint64_t)(end - current));
-    char country[100] = "";
-    record_to_before_next(&current, '"', (uint64_t)(end - current), country);
-    printf("***%s***\n", country);
+        skip_to_after_next(&current, '"', (uint64_t)(end - current));
+        char ico[7] = "";
+        record_to_before_next(&current, '"', (uint64_t)(end - current), ico);
+        printf("***%s***\n", ico);
+        skip_to_after_next(&current, '"', (uint64_t)(end - current));
+        skip_to_after_next(&current, '"', (uint64_t)(end - current));
 
-    skip_to_after_next(&current, ',', (uint64_t)(end - current));
-    skip_to_after_next(&current, ',', (uint64_t)(end - current));
-    skip_to_after_next(&current, ',', (uint64_t)(end - current));
+        char callsign[9] = "";
+        record_to_before_next(&current, '"', (uint64_t)(end - current),
+                              callsign);
+        printf("***%s***\n", callsign);
 
-    char longitude_str[100] = "";
-    record_to_before_next(&current, ',', (uint64_t)(end - current),
-                          longitude_str);
-    double longitude = strtod(longitude_str, NULL);
-    printf("longitude: %f\n", longitude);
-    skip_to_after_next(&current, ',', (uint64_t)(end - current));
+        skip_to_after_next(&current, '"', (uint64_t)(end - current));
+        skip_to_after_next(&current, '"', (uint64_t)(end - current));
+        char country[100] = "";
+        record_to_before_next(&current, '"', (uint64_t)(end - current),
+                              country);
+        printf("***%s***\n", country);
 
-    char latitude_str[100] = "";
-    record_to_before_next(&current, ',', (uint64_t)(end - current),
-                          latitude_str);
-    double latitude = strtod(latitude_str, NULL);
-    printf("latitude: %f\n", latitude);
-    skip_to_after_next(&current, ',', (uint64_t)(end - current));
+        skip_to_after_next(&current, ',', (uint64_t)(end - current));
+        skip_to_after_next(&current, ',', (uint64_t)(end - current));
+        skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
-    char altitude_str[100] = "";
-    record_to_before_next(&current, ',', (uint64_t)(end - current),
-                          altitude_str);
-    double altitude = strtod(altitude_str, NULL);
-    printf("altitude: %f\n", altitude);
-    skip_to_after_next(&current, ',', (uint64_t)(end - current));
+        char longitude_str[100] = "";
+        record_to_before_next(&current, ',', (uint64_t)(end - current),
+                              longitude_str);
+        double longitude = strtod(longitude_str, NULL);
+        printf("longitude: %f\n", longitude);
+        skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
-    // printf("current: %c %ld\n", *current, end - current);
+        char latitude_str[100] = "";
+        record_to_before_next(&current, ',', (uint64_t)(end - current),
+                              latitude_str);
+        double latitude = strtod(latitude_str, NULL);
+        printf("latitude: %f\n", latitude);
+        skip_to_after_next(&current, ',', (uint64_t)(end - current));
+
+        char altitude_str[100] = "";
+        record_to_before_next(&current, ',', (uint64_t)(end - current),
+                              altitude_str);
+        double altitude = strtod(altitude_str, NULL);
+        printf("altitude: %f\n", altitude);
+    }
     return 0;
 }
