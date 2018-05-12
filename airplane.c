@@ -67,14 +67,21 @@ int main(int argc, const char* argv[]) {
     printf("***%s***\n", callsign);
 
     skip_to_after_next(&current, '"', (uint64_t)(end - current));
-    printf("current: %c (%lu)\n", *current, current - content);
+    skip_to_after_next(&current, '"', (uint64_t)(end - current));
+    char country[100] = "";
+    record_to_before_next(&current, '"', (uint64_t)(end - current), country);
+    printf("***%s***\n", country);
 
-    // char* end_of_country = memchr(current, '"', current - content);
-    // char country[100] = "";
-    // memcpy(country, current, end_of_country - current);
-    // printf("***%s***\n", country);
-    // current += end_of_country - current + 2;
-    // printf("%c\n", *current);
+    skip_to_after_next(&current, ',', (uint64_t)(end - current));
+    skip_to_after_next(&current, ',', (uint64_t)(end - current));
+    skip_to_after_next(&current, ',', (uint64_t)(end - current));
+
+    char longitude_str[100] = "";
+    record_to_before_next(&current, '"', (uint64_t)(end - current),
+                          longitude_str);
+    double longitude = strtod(longitude_str, NULL);
+    printf("Lng: %f\n", longitude);
+
     // current = memchr(current, ',', current - content) + 1;
     // current = memchr(current, ',', current - content) + 1;
 
