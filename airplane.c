@@ -15,6 +15,7 @@ void record_to_before_next(char** current, char needle, uint64_t size,
 void skip_to_after_next(char** current, char needle, uint64_t size);
 void skip_to_next(char** current, char needle, uint64_t size);
 double dist(double x1, double y1, double z1, double x2, double y2, double z2);
+size_t curl_cb(void* content, size_t size, size_t nmemb, void* userp);
 
 void skip_to_next(char** current, char needle, uint64_t size) {
     *current = memchr(*current, needle, size);
