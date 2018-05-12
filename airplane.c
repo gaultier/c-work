@@ -10,6 +10,11 @@
 #include "math.h"
 #include "utils.h"
 
+void record_to_before_next(char** current, char needle, uint64_t size,
+                           char* result);
+void skip_to_after_next(char** current, char needle, uint64_t size);
+void skip_to_next(char** current, char needle, uint64_t size);
+
 void skip_to_next(char** current, char needle, uint64_t size) {
     *current = memchr(*current, needle, size);
 }
