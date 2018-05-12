@@ -1,14 +1,14 @@
+#include <curl/curl.h>
 #include <errno.h>
 #include <float.h>
 #include <inttypes.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-#include "math.h"
-#include "utils.h"
 
 void record_to_before_next(char** current, char needle, uint64_t size,
                            char* result);
@@ -38,21 +38,51 @@ double dist(double x1, double y1, double z1, double x2, double y2, double z2) {
            (z1 - z2) * (z1 - z2);
 }
 
+typedef struct {
+    char* data;
+    uint64_t size;
+} Json;
+
+size_t curl_cb(void* content, size_t size, size_t nmemb, void* userp) {
+    uint64_t real_size = size * nmemb;
+    printf("Real size: %d\n", real_size);
+    Json* json = (Json*)userp;
+    json->data = realloc(json->data, json->size + real_size + 1);
+    memcpy(&(json->data[json->size]), content, real_size);
+
+    json->size += real_size;
+    json->data[json->size] = 0;
+
+    return real_size;
+}
+
 int main(int argc, const char* argv[]) {
     if (argc != 4) return 0;
     const uint64_t earth_radius = 6371;
-    const double argv_latitude = M_PI * strtod(argv[2], NULL) / 180;
-    const double argv_longitude = M_PI * strtod(argv[3], NULL) / 180;
+    const double argv_latitude = M_PI * strtod(argv[1], NULL) / 180;
+    const double argv_longitude = M_PI * strtod(argv[2], NULL) / 180;
     double argv_x = earth_radius * sin(argv_latitude) * cos(argv_longitude);
     double argv_y = earth_radius * sin(argv_latitude) * sin(argv_longitude);
     double argv_z = earth_radius * cos(argv_latitude);
 
-    char* content;
-    uint64_t size;
-    const int read_result = readFile(argv[1], &content, &size);
-    if (read_result == -1) return 1;
-    char* end = content + size;
-    char* current = content;
+    CURL* curl = curl_easy_init();
+    Json json = {.size = 0, .data = malloc(1)};
+
+    if (curl) {
+        CURLcode res;
+        curl_easy_setopt(curl, CURLOPT_URL, argv[3]);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_cb);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &json);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            fprintf(stderr, "curl failed: %s\n", curl_easy_strerror(res));
+        }
+        curl_easy_cleanup(curl);
+    }
+    printf("JSON: %s\n", json.data);
+    char* end = json.data + json.size;
+    char* current = json.data;
 
     char best_ico[7] = "";
     char best_callsign[9] = "";
