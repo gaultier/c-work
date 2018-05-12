@@ -14,6 +14,7 @@ void record_to_before_next(char** current, char needle, uint64_t size,
                            char* result);
 void skip_to_after_next(char** current, char needle, uint64_t size);
 void skip_to_next(char** current, char needle, uint64_t size);
+double dist(double x1, double y1, double z1, double x2, double y2, double z2);
 
 void skip_to_next(char** current, char needle, uint64_t size) {
     *current = memchr(*current, needle, size);
@@ -32,17 +33,19 @@ void record_to_before_next(char** current, char needle, uint64_t size,
     *current = end;
 }
 
+double dist(double x1, double y1, double z1, double x2, double y2, double z2) {
+    return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) +
+           (z1 - z2) * (z1 - z2);
+}
+
 int main(int argc, const char* argv[]) {
     if (argc != 4) return 0;
+    const uint64_t earth_radius = 6371;
     const double argv_latitude = M_PI * strtod(argv[2], NULL) / 180;
     const double argv_longitude = M_PI * strtod(argv[3], NULL) / 180;
-    const uint64_t earth_radius = 6371000;
-    const double argv_thetha = argv_longitude;
-    const double argv_phi = M_PI - argv_latitude;
-
-    double argv_x = earth_radius * sin(argv_thetha) * cos(argv_phi);
-    double argv_y = earth_radius * sin(argv_thetha) * sin(argv_phi);
-    double argv_z = earth_radius * cos(argv_thetha);
+    double argv_x = earth_radius * sin(argv_latitude) * cos(argv_longitude);
+    double argv_y = earth_radius * sin(argv_latitude) * sin(argv_longitude);
+    double argv_z = earth_radius * cos(argv_latitude);
     printf("Lat=%f Lng=%f X=%f Y=%f Z=%f\n", argv_latitude, argv_longitude,
            argv_x, argv_y, argv_z);
 
@@ -54,12 +57,14 @@ int main(int argc, const char* argv[]) {
     printf("Size: %llu\n", size);
     char* current = content;
 
+    char best_ico[7] = "";
+    char best_callsign[9] = "";
+    char best_country[100] = "";
+    double min_dist = DBL_MAX;
+
     while (current < end) {
         skip_to_next(&current, '[', (uint64_t)(end - current));
-        if (!current) {
-            printf("The end\n");
-            break;
-        }
+        if (!current) break;
 
         skip_to_after_next(&current, '"', (uint64_t)(end - current));
         char ico[7] = "";
@@ -87,15 +92,15 @@ int main(int argc, const char* argv[]) {
         char longitude_str[100] = "";
         record_to_before_next(&current, ',', (uint64_t)(end - current),
                               longitude_str);
-        double longitude = strtod(longitude_str, NULL);
-        printf("longitude: %f\n", longitude);
+        double longitude_deg = strtod(longitude_str, NULL);
+        printf("longitude_deg: %f\n", longitude_deg);
         skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
         char latitude_str[100] = "";
         record_to_before_next(&current, ',', (uint64_t)(end - current),
                               latitude_str);
-        double latitude = strtod(latitude_str, NULL);
-        printf("latitude: %f\n", latitude);
+        double latitude_deg = strtod(latitude_str, NULL);
+        printf("latitude_deg: %f\n", latitude_deg);
         skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
         char altitude_str[100] = "";
@@ -103,6 +108,29 @@ int main(int argc, const char* argv[]) {
                               altitude_str);
         double altitude = strtod(altitude_str, NULL);
         printf("altitude: %f\n\n", altitude);
+
+        const double latitude_rad = M_PI * latitude_deg / 180;
+        const double longitude_rad = M_PI * longitude_deg / 180;
+        const double x =
+            (earth_radius + altitude) * sin(latitude_rad) * cos(longitude_rad);
+        const double y =
+            (earth_radius + altitude) * sin(latitude_rad) * sin(longitude_rad);
+        const double z = (earth_radius + altitude) * cos(latitude_rad);
+
+        const double d = dist(argv_x, argv_y, argv_z, x, y, z);
+        printf("X: %f Y: %f Z: %f D: %f\n", x, y, z, d);
+
+        if (d < min_dist) {
+            printf("better\n");
+            min_dist = d;
+            strcpy(best_ico, ico);
+            strcpy(best_callsign, callsign);
+            strcpy(best_country, country);
+        }
     }
+
+    printf("Best distance: %.3f km\nIco: %s\nCall sign: %s\nCountry: %s\n",
+           sqrt(min_dist), best_ico, best_callsign, best_country);
+
     return 0;
 }
