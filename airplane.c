@@ -10,47 +10,22 @@
 #include "math.h"
 #include "utils.h"
 
-// uint64_t str_to_uint64(const char* content, int start, int end);
-// double str_to_double(const char* content, int start, int end);
-// double dist_squared(double x1, double y1, double x2, double y2);
-//
-// void str_fprintf(FILE* fd, const char* content, int start, int end) {
-//    for (int64_t i = start; i < end; i++) fprintf(fd, "%c", content[i]);
-//}
-//
-// uint64_t str_to_uint64(const char* content, int start, int end) {
-//    int token_length = (end - start);
-//    char buf[token_length];
-//    memcpy(buf, &content[start], token_length);
-//    buf[token_length] = '\0';
-//    uint64_t num = strtoull(buf, NULL, 10);
-//    if (num == 0 || num == ULLONG_MAX)
-//        fprintf(stderr,
-//                "Could not convert primitive to uint64_t: %s errno=%d "
-//                "(input was `%s`)\n",
-//                strerror(errno), errno, buf);
-//
-//    return num;
-//}
-//
-// double str_to_double(const char* content, int start, int end) {
-//    int token_length = (end - start);
-//    char buf[token_length];
-//    memcpy(buf, &content[start], token_length);
-//    buf[token_length] = '\0';
-//    double num = strtod(buf, NULL);
-//    if (num == HUGE_VAL || num == -HUGE_VAL)
-//        fprintf(stderr,
-//                "Could not convert primitive to double: %s errno=%d "
-//                "(input was `%s`)\n",
-//                strerror(errno), errno, buf);
-//
-//    return num;
-//}
-//
-// double dist_squared(double x1, double y1, double x2, double y2) {
-//    return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-//}
+void skip_to_next(char** current, char needle, uint64_t size) {
+    *current = memchr(*current, needle, size);
+}
+
+void skip_to_after_next(char** current, char needle, uint64_t size) {
+    skip_to_next(current, needle, size);
+    (*current)++;
+}
+
+void record_to_before_next(char** current, char needle, uint64_t size,
+                           char* result) {
+    char* end = *current;
+    skip_to_next(&end, needle, size);
+    memcpy(result, *current, end - *current);
+    *current = end;
+}
 
 int main(int argc, const char* argv[]) {
     if (argc != 4) return 0;
@@ -70,58 +45,60 @@ int main(int argc, const char* argv[]) {
     uint64_t size;
     const int read_result = readFile(argv[1], &content, &size);
     if (read_result == -1) return 1;
+    char* end = content + size;
     printf("Size: %llu\n", size);
 
-    char* start = memchr(content, '[', size);
-    start += 2;
-    printf("Start: %c (%u)\n", start, start - content);
-    //
-    //    double min_dist_sq = DBL_MAX;
-    //
-    //    for (int i = 5; i < tok_count; i += 18) {
-    //        if (tok[i].type != JSMN_ARRAY) {
-    //            fprintf(stderr, "[%d] Expected array, got type=%d\n", i,
-    //                    tok[i].type);
-    //            return 1;
-    //        } else if (tok[i].size != 17) {
-    //            fprintf(stderr, "[%d] Unexpected array size: %d != 17\n", i,
-    //                    tok[i].size);
-    //            return 1;
-    //        }
-    //
-    //        printf("[%d] State %d:\n", i, (i - 5) / 18 + 1);
-    //
-    //        for (int j = i + 1; j <= i + 17; j++) {
-    //            if (tok[j].type != JSMN_PRIMITIVE && tok[j].type !=
-    //            JSMN_STRING) {
-    //                fprintf(stderr,
-    //                        "[%d][%d] Expected primitive or string, got
-    //                        type=%d\n", i, j, tok[j].type);
-    //                return 1;
-    //            }
-    //            printf("\t- ");
-    //            str_fprintf(stdout, content, tok[j].start, tok[j].end);
-    //            printf("\n");
-    //        }
-    //        double latitude =
-    //            str_to_double(content, tok[i + 6].start, tok[i + 6].end);
-    //        double longitude =
-    //            str_to_double(content, tok[i + 7].start, tok[i + 7].end);
-    //        double altitude =
-    //            str_to_double(content, tok[i + 8].start, tok[i + 8].end);
-    //        double x = (earth_radius + altitude) * cos(longitude);
-    //        double y = (earth_radius + altitude) * sin(latitude);
-    //
-    //        printf("Lat=%f Lng=%f Alt=%f X=%f Y=%f\n", latitude, longitude,
-    //               altitude, x, y);
-    //        double dist_sq = dist_squared(x, y, argv_x, argv_y);
-    //        if (dist_sq < min_dist_sq) {
-    //            min_dist_sq = dist_sq;
-    //            best = &tok[i + 1];
-    //        }
-    //    }
-    //    printf("Best: %f\n", min_dist_sq);
-    //    str_fprintf(stdout, content, best->start, best->end);
+    char* current = content;
+    skip_to_next(&current, '[', size);
+    skip_to_after_next(&current, '"', (uint64_t)(end - current));
+    char ico[7] = "";
+    record_to_before_next(&current, '"', (uint64_t)(end - current), ico);
+    printf("***%s***\n", ico);
+    skip_to_after_next(&current, '"', (uint64_t)(end - current));
+    skip_to_after_next(&current, '"', (uint64_t)(end - current));
+
+    char callsign[9] = "";
+    record_to_before_next(&current, '"', (uint64_t)(end - current), callsign);
+    printf("***%s***\n", callsign);
+
+    skip_to_after_next(&current, '"', (uint64_t)(end - current));
+    printf("current: %c (%lu)\n", *current, current - content);
+
+    // char* end_of_country = memchr(current, '"', current - content);
+    // char country[100] = "";
+    // memcpy(country, current, end_of_country - current);
+    // printf("***%s***\n", country);
+    // current += end_of_country - current + 2;
+    // printf("%c\n", *current);
+    // current = memchr(current, ',', current - content) + 1;
+    // current = memchr(current, ',', current - content) + 1;
+
+    // char* longitude_end = memchr(current, ',', current - content) - 1;
+    // char longitude_str[100] = "";
+    // memcpy(longitude_str, current, longitude_(uint64_t)(end - current));
+    // double longitude = strtod(longitude_str, NULL);
+    // printf("Lng: %f\n", longitude);
+    // current = longitude_end + 2;
+
+    // char* latitude_end = memchr(current, ',', current - content) - 1;
+    // char latitude_str[100] = "";
+    // memcpy(latitude_str, current, latitude_(uint64_t)(end - current));
+    // double latitude = strtod(latitude_str, NULL);
+    // printf("Lat: %f\n", latitude);
+    // current = latitude_end + 2;
+
+    // char* altitude_end = memchr(current, ',', current - content) - 1;
+    // char altitude_str[100] = "";
+    // memcpy(altitude_str, current, altitude_(uint64_t)(end - current));
+    // double altitude = strtod(altitude_str, NULL);
+    // printf("Alt: %f\n", altitude);
+    // current = altitude_end + 2;
+
+    // printf("current: %c (%llu)\n", *current, current - content);
+
+    // char* end = memchr(current, ']', size - current_i);
+    // uint64_t end_i = end - content;
+    // printf("End: %c (%llu)\n", *end, end_i);
 
     return 0;
 }
