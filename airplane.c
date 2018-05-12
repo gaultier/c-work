@@ -55,8 +55,11 @@ int main(int argc, const char* argv[]) {
     char* current = content;
 
     while (current < end) {
-        skip_to_next(&current, '[', size);
-        if (!current) break;
+        skip_to_next(&current, '[', (uint64_t)(end - current));
+        if (!current) {
+            printf("The end\n");
+            break;
+        }
 
         skip_to_after_next(&current, '"', (uint64_t)(end - current));
         char ico[7] = "";
@@ -99,7 +102,7 @@ int main(int argc, const char* argv[]) {
         record_to_before_next(&current, ',', (uint64_t)(end - current),
                               altitude_str);
         double altitude = strtod(altitude_str, NULL);
-        printf("altitude: %f\n", altitude);
+        printf("altitude: %f\n\n", altitude);
     }
     return 0;
 }
