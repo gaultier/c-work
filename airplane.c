@@ -46,15 +46,12 @@ int main(int argc, const char* argv[]) {
     double argv_x = earth_radius * sin(argv_latitude) * cos(argv_longitude);
     double argv_y = earth_radius * sin(argv_latitude) * sin(argv_longitude);
     double argv_z = earth_radius * cos(argv_latitude);
-    printf("Lat=%f Lng=%f X=%f Y=%f Z=%f\n", argv_latitude, argv_longitude,
-           argv_x, argv_y, argv_z);
 
     char* content;
     uint64_t size;
     const int read_result = readFile(argv[1], &content, &size);
     if (read_result == -1) return 1;
     char* end = content + size;
-    printf("Size: %llu\n", size);
     char* current = content;
 
     char best_ico[7] = "";
@@ -69,21 +66,18 @@ int main(int argc, const char* argv[]) {
         skip_to_after_next(&current, '"', (uint64_t)(end - current));
         char ico[7] = "";
         record_to_before_next(&current, '"', (uint64_t)(end - current), ico);
-        printf("***%s***\n", ico);
         skip_to_after_next(&current, '"', (uint64_t)(end - current));
         skip_to_after_next(&current, '"', (uint64_t)(end - current));
 
         char callsign[9] = "";
         record_to_before_next(&current, '"', (uint64_t)(end - current),
                               callsign);
-        printf("***%s***\n", callsign);
 
         skip_to_after_next(&current, '"', (uint64_t)(end - current));
         skip_to_after_next(&current, '"', (uint64_t)(end - current));
         char country[100] = "";
         record_to_before_next(&current, '"', (uint64_t)(end - current),
                               country);
-        printf("***%s***\n", country);
 
         skip_to_after_next(&current, ',', (uint64_t)(end - current));
         skip_to_after_next(&current, ',', (uint64_t)(end - current));
@@ -93,21 +87,18 @@ int main(int argc, const char* argv[]) {
         record_to_before_next(&current, ',', (uint64_t)(end - current),
                               longitude_str);
         double longitude_deg = strtod(longitude_str, NULL);
-        printf("longitude_deg: %f\n", longitude_deg);
         skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
         char latitude_str[100] = "";
         record_to_before_next(&current, ',', (uint64_t)(end - current),
                               latitude_str);
         double latitude_deg = strtod(latitude_str, NULL);
-        printf("latitude_deg: %f\n", latitude_deg);
         skip_to_after_next(&current, ',', (uint64_t)(end - current));
 
         char altitude_str[100] = "";
         record_to_before_next(&current, ',', (uint64_t)(end - current),
                               altitude_str);
         double altitude = strtod(altitude_str, NULL);
-        printf("altitude: %f\n\n", altitude);
 
         const double latitude_rad = M_PI * latitude_deg / 180;
         const double longitude_rad = M_PI * longitude_deg / 180;
@@ -118,10 +109,9 @@ int main(int argc, const char* argv[]) {
         const double z = (earth_radius + altitude) * cos(latitude_rad);
 
         const double d = dist(argv_x, argv_y, argv_z, x, y, z);
-        printf("X: %f Y: %f Z: %f D: %f\n", x, y, z, d);
+        //               printf("X: %f Y: %f Z: %f D: %f\n", x, y, z, d);
 
         if (d < min_dist) {
-            printf("better\n");
             min_dist = d;
             strcpy(best_ico, ico);
             strcpy(best_callsign, callsign);
