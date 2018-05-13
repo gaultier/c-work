@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 enum Direction { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
+// enum Entity { NONE, WALL, MARIO, CRATE, CRATE_OK, OBJECTIVE };
 
 int main() {
     IMG_Init(IMG_INIT_JPG);
@@ -69,18 +70,19 @@ int main() {
         SDL_CreateTextureFromSurface(renderer, objective_surface);
     SDL_FreeSurface(objective_surface);
 
-    bool running = true;
-
     SDL_Rect mario_rect = {.w = CELL_SIZE, .h = CELL_SIZE, .x = 0, .y = 0};
-    SDL_Rect crate_rect = {
-        .w = CELL_SIZE, .h = CELL_SIZE, .x = 3 * CELL_SIZE, .y = 0};
-    SDL_Rect crate_ok_rect = {
-        .w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = 0};
-    SDL_Rect wall_rect = {
-        .w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = CELL_SIZE};
-    SDL_Rect objective_rect = {
-        .w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = 2 * CELL_SIZE};
+    SDL_Rect crate_rects[1] = {
+        {.w = CELL_SIZE, .h = CELL_SIZE, .x = 3 * CELL_SIZE, .y = 0}};
+    SDL_Rect crate_ok_rects[1] = {
+        {.w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = 0}};
+    SDL_Rect wall_rects[1] = {
+        {.w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = CELL_SIZE}};
+    SDL_Rect objective_rects[1] = {{.w = CELL_SIZE,
+                                    .h = CELL_SIZE,
+                                    .x = 4 * CELL_SIZE,
+                                    .y = 2 * CELL_SIZE}};
     const uint16_t velocity = CELL_SIZE;
+    bool running = true;
     while (running) {
         SDL_Event e;
         SDL_WaitEvent(&e);
@@ -113,10 +115,15 @@ int main() {
         }
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, current, NULL, &mario_rect);
-        SDL_RenderCopy(renderer, crate, NULL, &crate_rect);
-        SDL_RenderCopy(renderer, crate_ok, NULL, &crate_ok_rect);
-        SDL_RenderCopy(renderer, wall, NULL, &wall_rect);
-        SDL_RenderCopy(renderer, objective, NULL, &objective_rect);
+        for (uint8_t i = 0; i < 1; i++)
+            SDL_RenderCopy(renderer, crate, NULL, &crate_rects[i]);
+        for (uint8_t i = 0; i < 1; i++)
+            SDL_RenderCopy(renderer, crate_ok, NULL, &crate_ok_rects[1]);
+        for (uint8_t i = 0; i < 1; i++)
+            SDL_RenderCopy(renderer, wall, NULL, &wall_rects[1]);
+        for (uint8_t i = 0; i < 1; i++)
+            SDL_RenderCopy(renderer, objective, NULL, &objective_rects[1]);
+
         SDL_RenderPresent(renderer);
     }
 
