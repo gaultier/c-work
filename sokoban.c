@@ -49,8 +49,7 @@ int main() {
     SDL_FreeSurface(surface);
     SDL_Texture* current = mario[DIR_UP];
 
-    SDL_Texture* textures[6] = {NULL};
-    textures[MARIO] = current;
+    SDL_Texture* textures[5] = {NULL};
 
     SDL_Surface* crate_surface =
         IMG_Load("/Users/pgaultier/Downloads/sprites_mario_sokoban/crate.jpg");
@@ -77,16 +76,15 @@ int main() {
     FILE* map_file = fopen("map.txt", "r");
     unsigned char map[12 * 12] = {0};
     fread(map, 1, 12 * 12, map_file);
-    SDL_Rect mario_rect = {.w = CELL_SIZE, .h = CELL_SIZE, .x = 0, .y = 0};
+
+    uint8_t mario_cell = 0;
     for (uint8_t i = 0; i < 12 * 12; i++) {
         map[i] -= '0';
         if (map[i] == MARIO) {
-            mario_rect.x = CELL_SIZE * (i % 12);
-            mario_rect.y = CELL_SIZE * (i / 12);
+            mario_cell = i;
         }
     };
 
-    const uint16_t velocity = CELL_SIZE;
     bool running = true;
     while (running) {
         SDL_Event e;
@@ -100,21 +98,20 @@ int main() {
                     break;
                 case SDLK_UP:
                     current = mario[DIR_UP];
-                    if (mario_rect.y - velocity >= 0) mario_rect.y -= velocity;
+                    if (mario_cell >= 12) mario_cell -= 12;
+
                     break;
                 case SDLK_RIGHT:
                     current = mario[DIR_RIGHT];
-                    if (mario_rect.x + velocity + mario_rect.w <= SCREEN_WIDTH)
-                        mario_rect.x += velocity;
+                    if ((1 + mario_cell) % 12 != 0) mario_cell += 1;
                     break;
                 case SDLK_DOWN:
                     current = mario[DIR_DOWN];
-                    if (mario_rect.y + velocity + mario_rect.h <= SCREEN_HEIGHT)
-                        mario_rect.y += velocity;
+                    if (mario_cell <= 11 * 12 - 1) mario_cell += 12;
                     break;
                 case SDLK_LEFT:
                     current = mario[DIR_LEFT];
-                    if (mario_rect.x - velocity >= 0) mario_rect.x -= velocity;
+                    if (mario_cell % 12 != 0) mario_cell -= 1;
                     break;
             }
         }
@@ -128,7 +125,12 @@ int main() {
                 SDL_RenderCopy(renderer, textures[map[i]], NULL, &rect);
             }
         }
-        SDL_RenderCopy(renderer, textures[MARIO], NULL, &mario_rect);
+        SDL_Rect mario_rect = {.w = CELL_SIZE,
+                               .h = CELL_SIZE,
+                               .x = CELL_SIZE * (mario_cell % 12),
+                               .y = CELL_SIZE * (mario_cell / 12)};
+        SDL_RenderCopy(renderer, current, NULL, &mario_rect);
+
         SDL_RenderPresent(renderer);
     }
     SDL_DestroyTexture(mario[0]);
