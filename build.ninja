@@ -48,3 +48,9 @@ build build/release/airplane: link_release build/release/airplane.o
     ldflags = -lcurl
     cflags_release = $cflags -Wno-disabled-macro-expansion
 
+build build/debug/sokoban.o: cc_o_debug sokoban.c
+build build/debug/sokoban: link_debug build/debug/sokoban.o 
+    ldflags =  -lSDL2 -lSDL2_image
+build build/release/sokoban.o: cc_o_release sokoban.c
+build build/release/sokoban: link_release build/release/sokoban.o
+    ldflags =  -lSDL2 -lSDL2_image
