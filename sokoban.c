@@ -51,6 +51,8 @@ int main() {
     const float time_frame = 1000 / 60;
     bool running = true;
     uint64_t frame_count = 0;
+
+    SDL_Rect mario_rect = {.w = 100, .h = 100, .x = 100, .y = 100};
     while (running) {
         time_t time_start = time(NULL);
         SDL_Event e;
@@ -77,7 +79,7 @@ int main() {
             }
         }
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, current, NULL, NULL);
+        SDL_RenderCopy(renderer, current, NULL, &mario_rect);
         SDL_RenderPresent(renderer);
         frame_count++;
         time_t time_end = time(NULL);
