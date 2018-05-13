@@ -49,7 +49,8 @@ int main() {
     SDL_FreeSurface(surface);
     SDL_Texture* current = mario[DIR_UP];
 
-    SDL_Texture* textures[5] = {NULL};
+    SDL_Texture* textures[6] = {NULL};
+    textures[MARIO] = current;
 
     SDL_Surface* crate_surface =
         IMG_Load("/Users/pgaultier/Downloads/sprites_mario_sokoban/crate.jpg");
@@ -76,9 +77,15 @@ int main() {
     FILE* map_file = fopen("map.txt", "r");
     unsigned char map[12 * 12] = {0};
     fread(map, 1, 12 * 12, map_file);
-    for (uint8_t i = 0; i < 12 * 12; i++) map[i] -= '0';
-
     SDL_Rect mario_rect = {.w = CELL_SIZE, .h = CELL_SIZE, .x = 0, .y = 0};
+    for (uint8_t i = 0; i < 12 * 12; i++) {
+        map[i] -= '0';
+        if (map[i] == MARIO) {
+            mario_rect.x = CELL_SIZE * (i % 12);
+            mario_rect.y = CELL_SIZE * (i / 12);
+        }
+    };
+
     const uint16_t velocity = CELL_SIZE;
     bool running = true;
     while (running) {
@@ -112,17 +119,16 @@ int main() {
             }
         }
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, current, NULL, &mario_rect);
         for (uint8_t i = 0; i < 12 * 12; i++) {
-            if (map[i]) {
+            if (map[i] != NONE && map[i] != MARIO) {
                 SDL_Rect rect = {.w = CELL_SIZE,
                                  .h = CELL_SIZE,
                                  .x = CELL_SIZE * (i % 12),
                                  .y = CELL_SIZE * (i / 12)};
-                printf("type=%u x=%d y=%d\n", map[i], rect.x, rect.y);
                 SDL_RenderCopy(renderer, textures[map[i]], NULL, &rect);
             }
         }
+        SDL_RenderCopy(renderer, textures[MARIO], NULL, &mario_rect);
         SDL_RenderPresent(renderer);
     }
     SDL_DestroyTexture(mario[0]);
