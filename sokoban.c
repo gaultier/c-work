@@ -117,8 +117,8 @@ int main() {
             if (map[i]) {
                 SDL_Rect rect = {.w = CELL_SIZE,
                                  .h = CELL_SIZE,
-                                 .x = CELL_SIZE * i / 12,
-                                 .y = CELL_SIZE * (i % 12)};
+                                 .x = CELL_SIZE * (i % 12),
+                                 .y = CELL_SIZE * (i / 12)};
                 printf("type=%u x=%d y=%d\n", map[i], rect.x, rect.y);
                 SDL_RenderCopy(renderer, textures[map[i]], NULL, &rect);
             }
