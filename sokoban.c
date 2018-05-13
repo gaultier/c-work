@@ -46,9 +46,35 @@ int main() {
     SDL_FreeSurface(surface);
     SDL_Texture* current = mario[DIR_UP];
 
+    SDL_Surface* crate_surface =
+        IMG_Load("/Users/pgaultier/Downloads/sprites_mario_sokoban/crate.jpg");
+    SDL_Texture* crate = SDL_CreateTextureFromSurface(renderer, crate_surface);
+    SDL_FreeSurface(crate_surface);
+
+    SDL_Surface* crate_ok_surface = IMG_Load(
+        "/Users/pgaultier/Downloads/sprites_mario_sokoban/crate_ok.jpg");
+    SDL_Texture* crate_ok =
+        SDL_CreateTextureFromSurface(renderer, crate_ok_surface);
+    SDL_FreeSurface(crate_ok_surface);
+
+    SDL_Surface* wall_surface =
+        IMG_Load("/Users/pgaultier/Downloads/sprites_mario_sokoban/wall.jpg");
+    SDL_Texture* wall = SDL_CreateTextureFromSurface(renderer, wall_surface);
+    SDL_FreeSurface(wall_surface);
+
+    SDL_Surface* objective_surface = IMG_Load(
+        "/Users/pgaultier/Downloads/sprites_mario_sokoban/objective.png");
+    SDL_Texture* objective =
+        SDL_CreateTextureFromSurface(renderer, objective_surface);
+    SDL_FreeSurface(objective_surface);
+
     bool running = true;
 
     SDL_Rect mario_rect = {.w = 34, .h = 34, .x = 0, .y = 0};
+    SDL_Rect crate_rect = {.w = 34, .h = 34, .x = 3 * 34, .y = 0};
+    SDL_Rect crate_ok_rect = {.w = 34, .h = 34, .x = 4 * 34, .y = 0};
+    SDL_Rect wall_rect = {.w = 34, .h = 34, .x = 4 * 34, .y = 34};
+    SDL_Rect objective_rect = {.w = 34, .h = 34, .x = 4 * 34, .y = 2 * 34};
     const uint16_t velocity = 34;
     while (running) {
         SDL_Event e;
@@ -82,6 +108,10 @@ int main() {
         }
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, current, NULL, &mario_rect);
+        SDL_RenderCopy(renderer, crate, NULL, &crate_rect);
+        SDL_RenderCopy(renderer, crate_ok, NULL, &crate_ok_rect);
+        SDL_RenderCopy(renderer, wall, NULL, &wall_rect);
+        SDL_RenderCopy(renderer, objective, NULL, &objective_rect);
         SDL_RenderPresent(renderer);
     }
 
