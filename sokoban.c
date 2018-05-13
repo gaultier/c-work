@@ -96,15 +96,20 @@ int main() {
                 case SDLK_ESCAPE:
                     running = false;
                     break;
-                case SDLK_UP:
+                case SDLK_UP: {
                     current = mario[DIR_UP];
-                    if (mario_cell >= 12) mario_cell -= 12;
-
+                    bool is_out = mario_cell < 12;
+                    bool is_next_cell_wall = map[mario_cell - 12] == WALL;
+                    if (!is_out && !is_next_cell_wall) mario_cell -= 12;
                     break;
-                case SDLK_RIGHT:
+                }
+                case SDLK_RIGHT: {
                     current = mario[DIR_RIGHT];
-                    if ((1 + mario_cell) % 12 != 0) mario_cell += 1;
+                    bool is_out = (1 + mario_cell) % 12 == 0;
+                    bool is_next_cell_wall = map[mario_cell + 1] == WALL;
+                    if (!is_out && !is_next_cell_wall) mario_cell += 1;
                     break;
+                }
                 case SDLK_DOWN:
                     current = mario[DIR_DOWN];
                     if (mario_cell <= 11 * 12 - 1) mario_cell += 12;
