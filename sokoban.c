@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-enum Direction { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
-enum Entity { NONE, WALL, CRATE, CRATE_OK, OBJECTIVE, MARIO };
+typedef enum { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } Direction;
+typedef enum { NONE, WALL, CRATE, CRATE_OK, OBJECTIVE, MARIO } Entity;
 
 int main() {
     IMG_Init(IMG_INIT_JPG);
@@ -74,12 +74,13 @@ int main() {
     SDL_FreeSurface(objective_surface);
 
     FILE* map_file = fopen("map.txt", "r");
-    unsigned char map[12 * 12] = {0};
-    fread(map, 1, 12 * 12, map_file);
+    unsigned char map_str[12 * 12] = {0};
+    Entity map[12 * 12] = {NONE};
+    fread(map_str, 1, 12 * 12, map_file);
 
     uint8_t mario_cell = 0;
     for (uint8_t i = 0; i < 12 * 12; i++) {
-        map[i] -= '0';
+        map[i] = (Entity)(map_str[i] - '0');
         if (map[i] == MARIO) {
             mario_cell = i;
         }
@@ -98,10 +99,43 @@ int main() {
                     break;
                 case SDLK_UP: {
                     current = mario[DIR_UP];
+
                     bool is_out = mario_cell < 12;
-                    Entity next_cell = map[mario_cell - 12];
-                    bool is_next_cell_wall = next_cell == WALL;
-                    if (!is_out && !is_next_cell_wall) mario_cell -= 12;
+                    if (is_out) break;
+                    Entity* next_cell = &map[mario_cell - 12];
+                    if (*next_cell == WALL) break;
+                    if (*next_cell == NONE || *next_cell == OBJECTIVE) {
+                        mario_cell -= 12;
+                        break;
+                    }
+                    if (*next_cell == CRATE_OK) break;
+
+                    bool has_next_next_cell = mario_cell >= 12 * 2;
+
+                    // Next cell is a crate at this point
+
+                    Entity* next_next_cell = &map[mario_cell - 12 * 2];
+                    if (*next_next_cell == WALL || *next_next_cell == CRATE ||
+                        *next_next_cell == CRATE_OK)
+                        break;
+
+                    Entity* current_cell = &map[mario_cell];
+                    if (*next_next_cell == NONE) {
+                        *next_next_cell = CRATE;
+                        *next_cell = MARIO;
+                        *current_cell = NONE;
+                        mario_cell -= 12;
+                        break;
+                    }
+
+                    if (*next_next_cell == OBJECTIVE) {
+                        *next_next_cell = CRATE_OK;
+                        *next_cell = MARIO;
+                        *current_cell = NONE;
+                        mario_cell -= 12;
+                        break;
+                    }
+
                     break;
                 }
                 case SDLK_RIGHT: {
