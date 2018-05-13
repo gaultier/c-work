@@ -110,14 +110,20 @@ int main() {
                     if (!is_out && !is_next_cell_wall) mario_cell += 1;
                     break;
                 }
-                case SDLK_DOWN:
+                case SDLK_DOWN: {
                     current = mario[DIR_DOWN];
-                    if (mario_cell <= 11 * 12 - 1) mario_cell += 12;
+                    bool is_out = mario_cell > 11 * 12 - 1;
+                    bool is_next_cell_wall = map[mario_cell + 12] == WALL;
+                    if (!is_out && !is_next_cell_wall) mario_cell += 12;
                     break;
-                case SDLK_LEFT:
+                }
+                case SDLK_LEFT: {
                     current = mario[DIR_LEFT];
-                    if (mario_cell % 12 != 0) mario_cell -= 1;
+                    bool is_out = mario_cell % 12 == 0;
+                    bool is_next_cell_wall = map[mario_cell - 1] == WALL;
+                    if (!is_out && !is_next_cell_wall) mario_cell -= 1;
                     break;
+                }
             }
         }
         SDL_RenderClear(renderer);
