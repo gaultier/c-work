@@ -25,7 +25,7 @@ int main() {
         printf("Error creating renderer\n");
         exit(1);
     }
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     SDL_Texture* mario[4];
     SDL_Surface* surface = NULL;
     surface = IMG_Load(
@@ -75,16 +75,22 @@ int main() {
 
     FILE* map_file = fopen("map.txt", "r");
     unsigned char map_str[12 * 12] = {0};
-    Entity map[12 * 12] = {NONE};
-    fread(map_str, 1, 12 * 12, map_file);
+    Entity map[12 * 13] = {NONE};
+    fread(map_str, 1, 12 * 13, map_file);
 
     uint8_t mario_cell = 0;
-    for (uint8_t i = 0; i < 12 * 12; i++) {
-        map[i] = (Entity)(map_str[i] - '0');
+    for (uint8_t i = 0, j = 0; j < 12 * 13; j++) {
+        if ((j + 1) % 13 == 0) continue;
+
+        printf("%d %d: %c\n", i, j, map_str[j]);
+        map[i] = (Entity)(map_str[j] - '0');
+        printf("%d\n", map[i]);
         if (map[i] == MARIO) {
             mario_cell = i;
         }
+        i++;
     };
+    printf("End\n");
 
     bool running = true;
     while (running) {
@@ -103,16 +109,15 @@ int main() {
                     bool is_out = mario_cell < 12;
                     if (is_out) break;
                     Entity* next_cell = &map[mario_cell - 12];
-                    if (*next_cell == WALL) break;
+                    if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         mario_cell -= 12;
                         break;
                     }
-                    if (*next_cell == CRATE_OK) break;
-
-                    bool has_next_next_cell = mario_cell >= 12 * 2;
 
                     // Next cell is a crate at this point
+                    bool has_next_next_cell = mario_cell >= 12 * 2;
+                    if (!has_next_next_cell) break;  // Crate against border
 
                     Entity* next_next_cell = &map[mario_cell - 12 * 2];
                     if (*next_next_cell == WALL || *next_next_cell == CRATE ||
