@@ -177,8 +177,12 @@ int main() {
                     }
 
                     if (*next_next_cell == OBJECTIVE) {
+                        if (*next_cell == CRATE_OK)
+                            *next_cell = OBJECTIVE;
+                        else
+                            *next_cell = NONE;
+
                         *next_next_cell = CRATE_OK;
-                        *next_cell = NONE;
                         mario_cell += 1;
                         break;
                     }
