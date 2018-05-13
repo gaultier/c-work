@@ -18,22 +18,35 @@ int main() {
                              SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) exit(1);
 
-    SDL_Surface* screen_surface = SDL_GetWindowSurface(window);
-    SDL_Surface* mario[4];
-    mario[DIR_UP] = IMG_Load(
+    SDL_Renderer* renderer =
+        SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        printf("Error creating renderer\n");
+        exit(1);
+    }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_Texture* mario[4];
+    SDL_Surface* surface = NULL;
+    surface = IMG_Load(
         "/Users/pgaultier/Downloads/sprites_mario_sokoban/mario_up.gif");
-    mario[DIR_RIGHT] = IMG_Load(
-        "/Users/pgaultier/Downloads/sprites_mario_sokoban/mario_right.gif");
-    mario[DIR_DOWN] = IMG_Load(
-        "/Users/pgaultier/Downloads/sprites_mario_sokoban/mario_down.gif");
-    mario[DIR_LEFT] = IMG_Load(
-        "/Users/pgaultier/Downloads/sprites_mario_sokoban/mario_left.gif");
-    SDL_Surface* current = mario[DIR_UP];
+    mario[DIR_UP] = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
 
-    // if (!mario_up) {
-    //    printf("Failed load mario_up: %s\n", SDL_GetError());
-    //    exit(1);
-    //}
+    surface = IMG_Load(
+        "/Users/pgaultier/Downloads/sprites_mario_sokoban/mario_right.gif");
+    mario[DIR_RIGHT] = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    surface = IMG_Load(
+        "/Users/pgaultier/Downloads/sprites_mario_sokoban/mario_down.gif");
+    mario[DIR_DOWN] = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    surface = IMG_Load(
+        "/Users/pgaultier/Downloads/sprites_mario_sokoban/mario_left.gif");
+    mario[DIR_LEFT] = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    SDL_Texture* current = mario[DIR_UP];
 
     bool running = true;
     while (running) {
@@ -60,14 +73,15 @@ int main() {
                     break;
             }
         }
-        SDL_BlitSurface(current, NULL, screen_surface, NULL);
-        SDL_UpdateWindowSurface(window);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, current, NULL, NULL);
+        SDL_RenderPresent(renderer);
     }
 
-    SDL_FreeSurface(mario[0]);
-    SDL_FreeSurface(mario[1]);
-    SDL_FreeSurface(mario[2]);
-    SDL_FreeSurface(mario[3]);
+    SDL_DestroyTexture(mario[0]);
+    SDL_DestroyTexture(mario[1]);
+    SDL_DestroyTexture(mario[2]);
+    SDL_DestroyTexture(mario[3]);
     SDL_DestroyWindow(window);
     SDL_Quit();
     IMG_Quit();
