@@ -119,7 +119,7 @@ int main() {
 
                     if (mario_cell < 12) break;  // Border
                     Entity* next_cell = &map[mario_cell - 12];
-                    if (*next_cell == WALL || *next_cell == CRATE_OK) break;
+                    if (*next_cell == WALL) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         mario_cell -= 12;
                         break;
@@ -155,7 +155,7 @@ int main() {
                     if ((1 + mario_cell) % 12 == 0) break;  // Border
 
                     Entity* next_cell = &map[mario_cell + 1];
-                    if (*next_cell == WALL || *next_cell == CRATE_OK) break;
+                    if (*next_cell == WALL) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         mario_cell += 1;
                         break;
@@ -190,7 +190,7 @@ int main() {
 
                     if (mario_cell > 11 * 12 - 1) break;  // Border
                     Entity* next_cell = &map[mario_cell + 12];
-                    if (*next_cell == WALL || *next_cell == CRATE_OK) break;
+                    if (*next_cell == WALL) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         mario_cell += 12;
                         break;
@@ -225,7 +225,7 @@ int main() {
 
                     if (mario_cell % 12 == 0) break;  // Border
                     Entity* next_cell = &map[mario_cell - 1];
-                    if (*next_cell == WALL || *next_cell == CRATE_OK) break;
+                    if (*next_cell == WALL) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         mario_cell -= 1;
                         break;
@@ -274,12 +274,6 @@ int main() {
         SDL_RenderCopy(renderer, current, NULL, &mario_rect);
 
         SDL_RenderPresent(renderer);
-
-        for (int i = 0; i < 12 * 12; i++) {
-            printf("%d", map[i]);
-            if ((i + 1) % 12 == 0) printf("\n");
-        }
-        printf("--------\n");
     }
     SDL_DestroyTexture(mario[0]);
     SDL_DestroyTexture(mario[1]);
