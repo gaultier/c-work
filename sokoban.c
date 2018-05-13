@@ -109,8 +109,7 @@ int main() {
                 case SDLK_UP: {
                     current = mario[DIR_UP];
 
-                    bool is_out = mario_cell < 12;
-                    if (is_out) break;
+                    if (mario_cell < 12) break;  // Border
                     Entity* next_cell = &map[mario_cell - 12];
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
@@ -148,9 +147,41 @@ int main() {
                 }
                 case SDLK_RIGHT: {
                     current = mario[DIR_RIGHT];
-                    bool is_out = (1 + mario_cell) % 12 == 0;
-                    bool is_next_cell_wall = map[mario_cell + 1] == WALL;
-                    if (!is_out && !is_next_cell_wall) mario_cell += 1;
+                    // WIP
+                    if ((1 + mario_cell) % 12 == 0) break;  // Border
+                    Entity* next_cell = &map[mario_cell - 12];
+                    if (*next_cell == WALL || *next_cell == CRATE_OK) break;
+                    if (*next_cell == NONE || *next_cell == OBJECTIVE) {
+                        mario_cell -= 12;
+                        break;
+                    }
+
+                    // Next cell is a crate at this point
+                    bool has_next_next_cell = mario_cell >= 12 * 2;
+                    if (!has_next_next_cell) break;  // Crate against border
+
+                    Entity* next_next_cell = &map[mario_cell - 12 * 2];
+                    if (*next_next_cell == WALL || *next_next_cell == CRATE ||
+                        *next_next_cell == CRATE_OK)
+                        break;
+
+                    Entity* current_cell = &map[mario_cell];
+                    if (*next_next_cell == NONE) {
+                        *next_next_cell = CRATE;
+                        *next_cell = MARIO;
+                        *current_cell = NONE;
+                        mario_cell -= 12;
+                        break;
+                    }
+
+                    if (*next_next_cell == OBJECTIVE) {
+                        *next_next_cell = CRATE_OK;
+                        *next_cell = MARIO;
+                        *current_cell = NONE;
+                        mario_cell -= 12;
+                        break;
+                    }
+
                     break;
                 }
                 case SDLK_DOWN: {
