@@ -6,6 +6,13 @@
 typedef enum { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } Direction;
 typedef enum { NONE, WALL, CRATE, CRATE_OK, OBJECTIVE, MARIO } Entity;
 
+void swap(Entity* a, Entity* b);
+void swap(Entity* a, Entity* b) {
+    Entity tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
 int main() {
     IMG_Init(IMG_INIT_JPG);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) exit(1);
@@ -91,6 +98,7 @@ int main() {
         map[i] = (Entity)(map_str[j] - '0');
         if (map[i] == MARIO) {
             mario_cell = i;
+            map[i] = NONE;
         }
         i++;
     };
@@ -109,13 +117,10 @@ int main() {
                 case SDLK_UP: {
                     current = mario[DIR_UP];
 
-                    Entity* current_cell = &map[mario_cell];
                     if (mario_cell < 12) break;  // Border
                     Entity* next_cell = &map[mario_cell - 12];
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        *current_cell = *next_cell;
-                        *next_cell = *current_cell;
                         mario_cell -= 12;
                         break;
                     }
@@ -130,17 +135,14 @@ int main() {
                         break;
 
                     if (*next_next_cell == NONE) {
-                        *next_next_cell = CRATE;
-                        *next_cell = MARIO;
-                        *current_cell = NONE;
+                        swap(next_cell, next_next_cell);
                         mario_cell -= 12;
                         break;
                     }
 
                     if (*next_next_cell == OBJECTIVE) {
                         *next_next_cell = CRATE_OK;
-                        *next_cell = MARIO;
-                        *current_cell = NONE;
+                        *next_cell = NONE;
                         mario_cell -= 12;
                         break;
                     }
@@ -150,15 +152,11 @@ int main() {
                 case SDLK_RIGHT: {
                     current = mario[DIR_RIGHT];
 
-                    Entity* current_cell = &map[mario_cell];
-
                     if ((1 + mario_cell) % 12 == 0) break;  // Border
 
                     Entity* next_cell = &map[mario_cell + 1];
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        *current_cell = *next_cell;
-                        *next_cell = *current_cell;
                         mario_cell += 1;
                         break;
                     }
@@ -173,17 +171,14 @@ int main() {
                         break;
 
                     if (*next_next_cell == NONE) {
-                        *next_next_cell = CRATE;
-                        *next_cell = MARIO;
-                        *current_cell = NONE;
+                        swap(next_cell, next_next_cell);
                         mario_cell += 1;
                         break;
                     }
 
                     if (*next_next_cell == OBJECTIVE) {
                         *next_next_cell = CRATE_OK;
-                        *next_cell = MARIO;
-                        *current_cell = NONE;
+                        *next_cell = NONE;
                         mario_cell += 1;
                         break;
                     }
@@ -193,14 +188,10 @@ int main() {
                 case SDLK_DOWN: {
                     current = mario[DIR_DOWN];
 
-                    Entity* current_cell = &map[mario_cell];
-
                     if (mario_cell > 11 * 12 - 1) break;  // Border
                     Entity* next_cell = &map[mario_cell + 12];
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        *current_cell = *next_cell;
-                        *next_cell = *current_cell;
                         mario_cell += 12;
                         break;
                     }
@@ -215,16 +206,14 @@ int main() {
                         break;
 
                     if (*next_next_cell == NONE) {
-                        *next_next_cell = CRATE;
-                        *next_cell = MARIO;
+                        swap(next_cell, next_next_cell);
                         mario_cell += 12;
                         break;
                     }
 
                     if (*next_next_cell == OBJECTIVE) {
                         *next_next_cell = CRATE_OK;
-                        *next_cell = MARIO;
-                        *current_cell = NONE;
+                        *next_cell = NONE;
                         mario_cell += 12;
                         break;
                     }
@@ -233,14 +222,11 @@ int main() {
                 }
                 case SDLK_LEFT: {
                     current = mario[DIR_LEFT];
-                    Entity* current_cell = &map[mario_cell];
 
                     if (mario_cell % 12 == 0) break;  // Border
                     Entity* next_cell = &map[mario_cell - 1];
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        *current_cell = *next_cell;
-                        *next_cell = *current_cell;
                         mario_cell -= 1;
                         break;
                     }
@@ -255,16 +241,14 @@ int main() {
                         break;
 
                     if (*next_next_cell == NONE) {
-                        *next_next_cell = CRATE;
-                        *next_cell = MARIO;
+                        swap(next_cell, next_next_cell);
                         mario_cell -= 1;
                         break;
                     }
 
                     if (*next_next_cell == OBJECTIVE) {
                         *next_next_cell = CRATE_OK;
-                        *next_cell = MARIO;
-                        *current_cell = NONE;
+                        *next_cell = NONE;
                         mario_cell -= 1;
                         break;
                     }
@@ -290,6 +274,12 @@ int main() {
         SDL_RenderCopy(renderer, current, NULL, &mario_rect);
 
         SDL_RenderPresent(renderer);
+
+        for (int i = 0; i < 12 * 12; i++) {
+            printf("%d", map[i]);
+            if ((i + 1) % 12 == 0) printf("\n");
+        }
+        printf("--------\n");
     }
     SDL_DestroyTexture(mario[0]);
     SDL_DestroyTexture(mario[1]);
