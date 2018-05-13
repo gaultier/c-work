@@ -99,7 +99,8 @@ int main() {
                 case SDLK_UP: {
                     current = mario[DIR_UP];
                     bool is_out = mario_cell < 12;
-                    bool is_next_cell_wall = map[mario_cell - 12] == WALL;
+                    Entity next_cell = map[mario_cell - 12];
+                    bool is_next_cell_wall = next_cell == WALL;
                     if (!is_out && !is_next_cell_wall) mario_cell -= 12;
                     break;
                 }
