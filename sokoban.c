@@ -115,7 +115,7 @@ int main() {
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         *current_cell = *next_cell;
-                        *next_cell = *current;
+                        *next_cell = *current_cell;
                         mario_cell -= 12;
                         break;
                     }
@@ -158,7 +158,7 @@ int main() {
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         *current_cell = *next_cell;
-                        *next_cell = *current;
+                        *next_cell = *current_cell;
                         mario_cell += 1;
                         break;
                     }
@@ -200,7 +200,7 @@ int main() {
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         *current_cell = *next_cell;
-                        *next_cell = *current;
+                        *next_cell = *current_cell;
                         mario_cell += 12;
                         break;
                     }
@@ -240,7 +240,7 @@ int main() {
                     if (*next_cell == WALL || *next_cell == CRATE_OK) break;
                     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
                         *current_cell = *next_cell;
-                        *next_cell = *current;
+                        *next_cell = *current_cell;
                         mario_cell -= 1;
                         break;
                     }
