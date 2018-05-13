@@ -8,8 +8,9 @@ int main() {
     IMG_Init(IMG_INIT_JPG);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) exit(1);
 
-    const uint16_t SCREEN_WIDTH = 12 * 34;
-    const uint16_t SCREEN_HEIGHT = 12 * 34;
+    const uint32_t CELL_SIZE = 34;
+    const uint16_t SCREEN_WIDTH = 12 * CELL_SIZE;
+    const uint16_t SCREEN_HEIGHT = 12 * CELL_SIZE;
 
     SDL_Window* window = SDL_CreateWindow("Sokoban", SDL_WINDOWPOS_UNDEFINED,
                                           SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
@@ -70,12 +71,16 @@ int main() {
 
     bool running = true;
 
-    SDL_Rect mario_rect = {.w = 34, .h = 34, .x = 0, .y = 0};
-    SDL_Rect crate_rect = {.w = 34, .h = 34, .x = 3 * 34, .y = 0};
-    SDL_Rect crate_ok_rect = {.w = 34, .h = 34, .x = 4 * 34, .y = 0};
-    SDL_Rect wall_rect = {.w = 34, .h = 34, .x = 4 * 34, .y = 34};
-    SDL_Rect objective_rect = {.w = 34, .h = 34, .x = 4 * 34, .y = 2 * 34};
-    const uint16_t velocity = 34;
+    SDL_Rect mario_rect = {.w = CELL_SIZE, .h = CELL_SIZE, .x = 0, .y = 0};
+    SDL_Rect crate_rect = {
+        .w = CELL_SIZE, .h = CELL_SIZE, .x = 3 * CELL_SIZE, .y = 0};
+    SDL_Rect crate_ok_rect = {
+        .w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = 0};
+    SDL_Rect wall_rect = {
+        .w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = CELL_SIZE};
+    SDL_Rect objective_rect = {
+        .w = CELL_SIZE, .h = CELL_SIZE, .x = 4 * CELL_SIZE, .y = 2 * CELL_SIZE};
+    const uint16_t velocity = CELL_SIZE;
     while (running) {
         SDL_Event e;
         SDL_WaitEvent(&e);
