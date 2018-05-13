@@ -53,6 +53,8 @@ int main() {
     uint64_t frame_count = 0;
 
     SDL_Rect mario_rect = {.w = 100, .h = 100, .x = 100, .y = 100};
+    const uint16_t velocity_x = 10;
+    const uint16_t velocity_y = 10;
     while (running) {
         time_t time_start = time(NULL);
         SDL_Event e;
@@ -66,15 +68,19 @@ int main() {
                     break;
                 case SDLK_UP:
                     current = mario[DIR_UP];
+                    mario_rect.y -= velocity_y;
                     break;
                 case SDLK_RIGHT:
                     current = mario[DIR_RIGHT];
+                    mario_rect.x += velocity_x;
                     break;
                 case SDLK_DOWN:
                     current = mario[DIR_DOWN];
+                    mario_rect.y += velocity_y;
                     break;
                 case SDLK_LEFT:
                     current = mario[DIR_LEFT];
+                    mario_rect.x -= velocity_x;
                     break;
             }
         }
