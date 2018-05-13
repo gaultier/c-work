@@ -46,14 +46,11 @@ int main() {
     SDL_FreeSurface(surface);
     SDL_Texture* current = mario[DIR_UP];
 
-    const float time_frame = 1000 / 60;
     bool running = true;
-    uint64_t frame_count = 0;
 
     SDL_Rect mario_rect = {.w = 34, .h = 34, .x = 0, .y = 0};
     const uint16_t velocity = 34;
     while (running) {
-        time_t time_start = time(NULL);
         SDL_Event e;
         SDL_WaitEvent(&e);
         if (e.type == SDL_QUIT)
@@ -86,11 +83,6 @@ int main() {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, current, NULL, &mario_rect);
         SDL_RenderPresent(renderer);
-        frame_count++;
-        time_t time_end = time(NULL);
-        time_t time_diff = time_end - time_start;
-        if (time_diff < time_frame)
-            SDL_Delay((uint32_t)(time_frame - time_diff));
     }
 
     SDL_DestroyTexture(mario[0]);
