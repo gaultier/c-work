@@ -8,14 +8,12 @@ int main() {
     IMG_Init(IMG_INIT_JPG);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) exit(1);
 
-    const uint16_t SCREEN_WIDTH = 500;
-    const uint16_t SCREEN_HEIGHT = 500;
+    const uint16_t SCREEN_WIDTH = 12 * 34;
+    const uint16_t SCREEN_HEIGHT = 12 * 34;
 
-    SDL_Window* window =
-        SDL_CreateWindow("Sokoban", SDL_WINDOWPOS_UNDEFINED,
-                         SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
-                         SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_GRABBED |
-                             SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_Window* window = SDL_CreateWindow("Sokoban", SDL_WINDOWPOS_UNDEFINED,
+                                          SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
+                                          SCREEN_HEIGHT, 0);
     if (!window) exit(1);
 
     SDL_Renderer* renderer =
@@ -52,13 +50,12 @@ int main() {
     bool running = true;
     uint64_t frame_count = 0;
 
-    SDL_Rect mario_rect = {.w = 100, .h = 100, .x = 100, .y = 100};
-    const uint16_t velocity_x = 10;
-    const uint16_t velocity_y = 10;
+    SDL_Rect mario_rect = {.w = 34, .h = 34, .x = 0, .y = 0};
+    const uint16_t velocity = 34;
     while (running) {
         time_t time_start = time(NULL);
         SDL_Event e;
-        SDL_PollEvent(&e);
+        SDL_WaitEvent(&e);
         if (e.type == SDL_QUIT)
             running = false;
         else if (e.type == SDL_KEYDOWN) {
@@ -68,19 +65,21 @@ int main() {
                     break;
                 case SDLK_UP:
                     current = mario[DIR_UP];
-                    mario_rect.y -= velocity_y;
+                    if (mario_rect.y - velocity >= 0) mario_rect.y -= velocity;
                     break;
                 case SDLK_RIGHT:
                     current = mario[DIR_RIGHT];
-                    mario_rect.x += velocity_x;
+                    if (mario_rect.x + velocity + mario_rect.w <= SCREEN_WIDTH)
+                        mario_rect.x += velocity;
                     break;
                 case SDLK_DOWN:
                     current = mario[DIR_DOWN];
-                    mario_rect.y += velocity_y;
+                    if (mario_rect.y + velocity + mario_rect.h <= SCREEN_HEIGHT)
+                        mario_rect.y += velocity;
                     break;
                 case SDLK_LEFT:
                     current = mario[DIR_LEFT];
-                    mario_rect.x -= velocity_x;
+                    if (mario_rect.x - velocity >= 0) mario_rect.x -= velocity;
                     break;
             }
         }
