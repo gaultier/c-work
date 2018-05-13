@@ -49,7 +49,7 @@ int main() {
     SDL_FreeSurface(surface);
     SDL_Texture* current = mario[DIR_UP];
 
-    SDL_Texture* textures[5] = {NULL};
+    SDL_Texture* textures[6] = {NULL};
 
     SDL_Surface* crate_surface =
         IMG_Load("/Users/pgaultier/Downloads/sprites_mario_sokoban/crate.jpg");
@@ -74,23 +74,26 @@ int main() {
     SDL_FreeSurface(objective_surface);
 
     FILE* map_file = fopen("map.txt", "r");
-    unsigned char map_str[12 * 12] = {0};
-    Entity map[12 * 13] = {NONE};
-    fread(map_str, 1, 12 * 13, map_file);
+    if (!map_file) exit(1);
+
+    unsigned char map_str[12 * 13] = {0};
+    Entity map[12 * 12] = {NONE};
+    uint64_t read_res = fread(map_str, 1, 12 * 13, map_file);
+    if (read_res == 0) exit(1);
+    fclose(map_file);
 
     uint8_t mario_cell = 0;
     for (uint8_t i = 0, j = 0; j < 12 * 13; j++) {
-        if ((j + 1) % 13 == 0) continue;
+        if (map_str[j] == '\n') {
+            continue;
+        }
 
-        printf("%d %d: %c\n", i, j, map_str[j]);
         map[i] = (Entity)(map_str[j] - '0');
-        printf("%d\n", map[i]);
         if (map[i] == MARIO) {
             mario_cell = i;
         }
         i++;
     };
-    printf("End\n");
 
     bool running = true;
     while (running) {
