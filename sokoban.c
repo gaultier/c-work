@@ -10,6 +10,7 @@ void swap(Entity* a, Entity* b);
 uint8_t get_next_cell_i(Direction dir, uint8_t cell);
 bool is_at_border(Direction direction, uint8_t cell);
 void go(Direction dir, uint8_t* cell, Entity map[144]);
+uint8_t count(Entity entity, Entity map[144]);
 
 void swap(Entity* a, Entity* b) {
     Entity tmp = *a;
@@ -41,6 +42,15 @@ uint8_t get_next_cell_i(Direction dir, uint8_t cell) {
         case DIR_LEFT:
             return cell - 1;
     }
+}
+
+uint8_t count(Entity entity, Entity map[144]) {
+    uint8_t c = 0;
+
+    for (uint8_t i = 0; i < 12 * 12; i++) {
+        if (map[i] == entity) c++;
+    };
+    return c;
 }
 
 void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
@@ -101,7 +111,7 @@ int main() {
     SDL_Renderer* renderer =
         SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer) {
-        printf("Error creating renderer\n");
+        fprintf(stderr, "Error creating renderer\n");
         exit(1);
     }
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -162,6 +172,8 @@ int main() {
     fclose(map_file);
 
     uint8_t mario_cell = 0;
+    uint8_t objectives_count = 0;
+    uint8_t crates_count = 0;
     for (uint8_t i = 0, j = 0; j < 12 * 13; j++) {
         if (map_str[j] == '\n') {
             continue;
@@ -171,9 +183,19 @@ int main() {
         if (map[i] == MARIO) {
             mario_cell = i;
             map[i] = NONE;
-        }
+        } else if (map[i] == CRATE)
+            crates_count++;
+        else if (map[i] == OBJECTIVE)
+            objectives_count++;
         i++;
     };
+    if (objectives_count == 0 || objectives_count != crates_count) {
+        fprintf(
+            stderr,
+            "Map error: the number of objectives is 0 or does not match the "
+            "crates number\n");
+        exit(1);
+    }
 
     bool running = true;
     while (running) {
@@ -207,6 +229,7 @@ int main() {
             }
         }
         SDL_RenderClear(renderer);
+
         for (uint8_t i = 0; i < 12 * 12; i++) {
             if (map[i] != NONE && map[i] != MARIO) {
                 SDL_Rect rect = {.w = CELL_SIZE,
@@ -221,8 +244,13 @@ int main() {
                                .x = CELL_SIZE * (mario_cell % 12),
                                .y = CELL_SIZE * (mario_cell / 12)};
         SDL_RenderCopy(renderer, current, NULL, &mario_rect);
-
         SDL_RenderPresent(renderer);
+
+        uint8_t crates_ok_count = count(CRATE_OK, map);
+        if (crates_ok_count == objectives_count) {
+            SDL_Delay(1000);
+            running = false;
+        }
     }
     SDL_DestroyTexture(mario[0]);
     SDL_DestroyTexture(mario[1]);
