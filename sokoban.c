@@ -13,33 +13,43 @@ void swap(Entity* a, Entity* b) {
     *b = tmp;
 }
 
-void move(Direction dir, uint8_t* mario_cell) {
+bool is_out(Direction dir, uint8_t mario_cell) {
     switch (dir) {
         case DIR_UP:
-            *mario_cell -= 12;
-            break;
+            return mario_cell < 12;
         case DIR_RIGHT:
-            *mario_cell += 1;
-            break;
+            return (1 + mario_cell) % 12 == 0;
         case DIR_DOWN:
-            *mario_cell += 12;
-            break;
+            return mario_cell > 11 * 12 - 1;
         case DIR_LEFT:
-            *mario_cell -= 1;
-            break;
+            return mario_cell % 12 == 0;
+    }
+}
+
+uint8_t get_next_cell_i(Direction dir, uint8_t mario_cell) {
+    switch (dir) {
+        case DIR_UP:
+            return mario_cell - 12;
+        case DIR_RIGHT:
+            return mario_cell + 1;
+        case DIR_DOWN:
+            return mario_cell + 12;
+        case DIR_LEFT:
+            return mario_cell - 1;
     }
 }
 
 void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     // MB
-    if (*mario_cell < 12) return;
+    if (is_out(dir, *mario_cell)) return;
 
-    Entity* next_cell = &map[*mario_cell - 12];
+    uint8_t next_cell_i = get_next_cell_i(dir, *mario_cell);
+    Entity* next_cell = &map[next_cell_i];
     // MW
     if (*next_cell == WALL) return;
     // MN, MO
     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-        move(dir, mario_cell);
+        *mario_cell = next_cell_i;
         return;
     }
 
@@ -50,6 +60,8 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     // MCB, MCoB
     if (!has_next_next_cell) return;
 
+    uint8_t next_next_cell_i =
+        get_next_cell_i(dir, get_next_cell_i(dir, *mario_cell));
     Entity* next_next_cell = &map[*mario_cell - 12 * 2];
 
     // MCW, MCC, MCC0, MCoW, MCoC, MCoCo
@@ -60,7 +72,7 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     // MCN, MCoN
     if (*next_next_cell == NONE) {
         swap(next_cell, next_next_cell);
-        move(dir, mario_cell);
+        *mario_cell = next_cell_i;
         return;
     }
 
@@ -68,7 +80,7 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     if (*next_next_cell == OBJECTIVE) {
         *next_next_cell = CRATE_OK;
         *next_cell = NONE;
-        move(dir, mario_cell);
+        *mario_cell = next_cell_i;
         return;
     }
 }
