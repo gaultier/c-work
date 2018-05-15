@@ -8,7 +8,7 @@ typedef enum { NONE, WALL, CRATE, CRATE_OK, OBJECTIVE, MARIO } Entity;
 
 void swap(Entity* a, Entity* b);
 uint8_t get_next_cell_i(Direction dir, uint8_t cell);
-bool is_out(uint8_t cell);
+bool is_at_border(Direction direction, uint8_t cell);
 void go(Direction dir, uint8_t* cell, Entity map[144]);
 
 void swap(Entity* a, Entity* b) {
@@ -17,9 +17,17 @@ void swap(Entity* a, Entity* b) {
     *b = tmp;
 }
 
-bool is_out(uint8_t cell) {
-    return cell < 0 || ((1 + cell) % 12 == 0) || cell >= 12 * 12 ||
-           cell % 12 == 0;
+bool is_at_border(Direction direction, uint8_t cell) {
+    switch (direction) {
+        case DIR_UP:
+            return cell < 12;
+        case DIR_RIGHT:
+            return ((1 + cell) % 12 == 0);
+        case DIR_DOWN:
+            return cell >= 11 * 12;
+        case DIR_LEFT:
+            return cell % 12 == 0;
+    }
 }
 
 uint8_t get_next_cell_i(Direction dir, uint8_t cell) {
@@ -36,10 +44,10 @@ uint8_t get_next_cell_i(Direction dir, uint8_t cell) {
 }
 
 void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
-    uint8_t next_cell_i = get_next_cell_i(dir, *mario_cell);
     // MB
-    if (is_out(next_cell_i)) return;
+    if (is_at_border(dir, *mario_cell)) return;
 
+    uint8_t next_cell_i = get_next_cell_i(dir, *mario_cell);
     Entity* next_cell = &map[next_cell_i];
     // MW
     if (*next_cell == WALL) return;
@@ -51,12 +59,10 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
 
     // MC*, MCo* at this point
 
-    uint8_t next_next_cell_i = get_next_cell_i(dir, next_cell_i);
-
     // MCB, MCoB
-    if (is_out(next_next_cell_i)) return;
+    if (is_at_border(dir, next_cell_i)) return;
 
-    Entity* next_next_cell = &map[next_next_cell_i];
+    Entity* next_next_cell = &map[get_next_cell_i(dir, next_cell_i)];
 
     // MCW, MCC, MCC0, MCoW, MCoC, MCoCo
     if (*next_next_cell == WALL || *next_next_cell == CRATE ||
