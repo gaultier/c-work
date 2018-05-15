@@ -13,6 +13,51 @@ void swap(Entity* a, Entity* b) {
     *b = tmp;
 }
 
+void move(Direction dir) {}
+
+void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
+    // MB
+    if (*mario_cell < 12) return;
+
+    Entity* next_cell = &map[*mario_cell - 12];
+    // MW
+    if (*next_cell == WALL) return;
+    // MN, MO
+    if (*next_cell == NONE || *next_cell == OBJECTIVE) {
+        *mario_cell -= 12;
+        return;
+    }
+
+    // MC*, MCo* at this point
+
+    bool has_next_next_cell = *mario_cell >= 12 * 2;
+
+    // MCB, MCoB
+    if (!has_next_next_cell) return;
+
+    Entity* next_next_cell = &map[*mario_cell - 12 * 2];
+
+    // MCW, MCC, MCC0, MCoW, MCoC, MCoCo
+    if (*next_next_cell == WALL || *next_next_cell == CRATE ||
+        *next_next_cell == CRATE_OK)
+        return;
+
+    // MCN, MCoN
+    if (*next_next_cell == NONE) {
+        swap(next_cell, next_next_cell);
+        *mario_cell -= 12;
+        return;
+    }
+
+    // MCO, MCoO
+    if (*next_next_cell == OBJECTIVE) {
+        *next_next_cell = CRATE_OK;
+        *next_cell = NONE;
+        *mario_cell -= 12;
+        return;
+    }
+}
+
 int main() {
     IMG_Init(IMG_INIT_JPG);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) exit(1);
@@ -116,37 +161,7 @@ int main() {
                     break;
                 case SDLK_UP: {
                     current = mario[DIR_UP];
-
-                    if (mario_cell < 12) break;  // Border
-                    Entity* next_cell = &map[mario_cell - 12];
-                    if (*next_cell == WALL) break;
-                    if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        mario_cell -= 12;
-                        break;
-                    }
-
-                    // Next cell is a crate at this point
-                    bool has_next_next_cell = mario_cell >= 12 * 2;
-                    if (!has_next_next_cell) break;  // Crate against border
-
-                    Entity* next_next_cell = &map[mario_cell - 12 * 2];
-                    if (*next_next_cell == WALL || *next_next_cell == CRATE ||
-                        *next_next_cell == CRATE_OK)
-                        break;
-
-                    if (*next_next_cell == NONE) {
-                        swap(next_cell, next_next_cell);
-                        mario_cell -= 12;
-                        break;
-                    }
-
-                    if (*next_next_cell == OBJECTIVE) {
-                        *next_next_cell = CRATE_OK;
-                        *next_cell = NONE;
-                        mario_cell -= 12;
-                        break;
-                    }
-
+                    go(DIR_UP, &mario_cell, map);
                     break;
                 }
                 case SDLK_RIGHT: {
