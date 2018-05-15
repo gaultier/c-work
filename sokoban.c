@@ -81,7 +81,8 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
 
     // MCN, MCoN
     if (*next_next_cell == NONE) {
-        swap(next_cell, next_next_cell);
+        *next_next_cell = CRATE;
+        *next_cell = *next_cell == CRATE_OK ? OBJECTIVE : NONE;
         *mario_cell = next_cell_i;
         return;
     }
