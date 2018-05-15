@@ -13,7 +13,22 @@ void swap(Entity* a, Entity* b) {
     *b = tmp;
 }
 
-void move(Direction dir) {}
+void move(Direction dir, uint8_t* mario_cell) {
+    switch (dir) {
+        case DIR_UP:
+            *mario_cell -= 12;
+            break;
+        case DIR_RIGHT:
+            *mario_cell += 1;
+            break;
+        case DIR_DOWN:
+            *mario_cell += 12;
+            break;
+        case DIR_LEFT:
+            *mario_cell -= 1;
+            break;
+    }
+}
 
 void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     // MB
@@ -24,7 +39,7 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     if (*next_cell == WALL) return;
     // MN, MO
     if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-        *mario_cell -= 12;
+        move(dir, mario_cell);
         return;
     }
 
@@ -45,7 +60,7 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     // MCN, MCoN
     if (*next_next_cell == NONE) {
         swap(next_cell, next_next_cell);
-        *mario_cell -= 12;
+        move(dir, mario_cell);
         return;
     }
 
@@ -53,7 +68,7 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     if (*next_next_cell == OBJECTIVE) {
         *next_next_cell = CRATE_OK;
         *next_cell = NONE;
-        *mario_cell -= 12;
+        move(dir, mario_cell);
         return;
     }
 }

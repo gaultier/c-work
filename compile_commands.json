@@ -1,2 +1,5 @@
 [
+    "directory": "/Users/pgaultier/c-work",
+    "file": "/Users/pgaultier/c-work/sokoban.c",
+    "command": "gcc -Weverything -O2 -std=c99 -c sokoban.c -o build/release/sokoban.o && gcc -Weverything -O2 -std=c99 -lSDL2 -lSDL2_image build/release/sokoban.o -o build/release/sokoban"
 ]
