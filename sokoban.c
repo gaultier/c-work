@@ -95,7 +95,8 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
     }
 }
 
-int main() {
+int main(int argc, const char* argv[]) {
+    if (argc != 2) return 0;
     IMG_Init(IMG_INIT_JPG);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) exit(1);
 
@@ -162,7 +163,7 @@ int main() {
         SDL_CreateTextureFromSurface(renderer, objective_surface);
     SDL_FreeSurface(objective_surface);
 
-    FILE* map_file = fopen("map.txt", "r");
+    FILE* map_file = fopen(argv[1], "r");
     if (!map_file) exit(1);
 
     unsigned char map_str[12 * 13] = {0};
