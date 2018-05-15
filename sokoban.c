@@ -198,6 +198,9 @@ int main(int argc, const char* argv[]) {
             "crates number\n");
         exit(1);
     }
+    Entity map_backup[12 * 12] = {NONE};
+    for (uint8_t i = 0; i < 144; i++) map_backup[i] = map[i];
+    const uint8_t mario_cell_backup = mario_cell;
 
     bool running = true;
     while (running) {
@@ -209,6 +212,11 @@ int main(int argc, const char* argv[]) {
             switch (e.key.keysym.sym) {
                 case SDLK_ESCAPE:
                     running = false;
+                    break;
+                case SDLK_r:
+                    for (uint8_t i = 0; i < 144; i++) map[i] = map_backup[i];
+                    mario_cell = mario_cell_backup;
+
                     break;
                 case SDLK_UP:
                     current = mario[DIR_UP];
