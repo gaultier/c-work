@@ -249,7 +249,16 @@ int main(int argc, const char* argv[]) {
 
         uint8_t crates_ok_count = count(CRATE_OK, map);
         if (crates_ok_count == objectives_count) {
-            SDL_Delay(1000);
+            SDL_MessageBoxData message_box = {
+                .flags = SDL_MESSAGEBOX_INFORMATION,
+                .window = window,
+                .title = "You won!",
+                .message = "Yeah!",
+                .numbuttons = 0,
+                .buttons = NULL,
+                .colorScheme = NULL};
+            int button_id = 0;
+            SDL_ShowMessageBox(&message_box, &button_id);
             running = false;
         }
     }
