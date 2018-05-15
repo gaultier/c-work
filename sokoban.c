@@ -180,121 +180,24 @@ int main() {
                 case SDLK_ESCAPE:
                     running = false;
                     break;
-                case SDLK_UP: {
+                case SDLK_UP:
                     current = mario[DIR_UP];
                     go(DIR_UP, &mario_cell, map);
                     break;
-                }
-                case SDLK_RIGHT: {
+                case SDLK_RIGHT:
                     current = mario[DIR_RIGHT];
-
-                    if ((1 + mario_cell) % 12 == 0) break;  // Border
-
-                    Entity* next_cell = &map[mario_cell + 1];
-                    if (*next_cell == WALL) break;
-                    if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        mario_cell += 1;
-                        break;
-                    }
-
-                    // Next cell is a crate at this point
-                    bool has_next_next_cell = (mario_cell + 2) % 12 != 0;
-                    if (!has_next_next_cell) break;  // Crate against border
-
-                    Entity* next_next_cell = &map[mario_cell + 2];
-                    if (*next_next_cell == WALL || *next_next_cell == CRATE ||
-                        *next_next_cell == CRATE_OK)
-                        break;
-
-                    if (*next_next_cell == NONE) {
-                        swap(next_cell, next_next_cell);
-                        mario_cell += 1;
-                        break;
-                    }
-
-                    if (*next_next_cell == OBJECTIVE) {
-                        if (*next_cell == CRATE_OK)
-                            *next_cell = OBJECTIVE;
-                        else
-                            *next_cell = NONE;
-
-                        *next_next_cell = CRATE_OK;
-                        mario_cell += 1;
-                        break;
-                    }
-
+                    go(DIR_RIGHT, &mario_cell, map);
                     break;
-                }
-                case SDLK_DOWN: {
+
+                case SDLK_DOWN:
                     current = mario[DIR_DOWN];
-
-                    if (mario_cell > 11 * 12 - 1) break;  // Border
-                    Entity* next_cell = &map[mario_cell + 12];
-                    if (*next_cell == WALL) break;
-                    if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        mario_cell += 12;
-                        break;
-                    }
-
-                    // Next cell is a crate at this point
-                    bool has_next_next_cell = mario_cell <= 10 * 12 - 1;
-                    if (!has_next_next_cell) break;  // Crate against border
-
-                    Entity* next_next_cell = &map[mario_cell + 12 * 2];
-                    if (*next_next_cell == WALL || *next_next_cell == CRATE ||
-                        *next_next_cell == CRATE_OK)
-                        break;
-
-                    if (*next_next_cell == NONE) {
-                        swap(next_cell, next_next_cell);
-                        mario_cell += 12;
-                        break;
-                    }
-
-                    if (*next_next_cell == OBJECTIVE) {
-                        *next_next_cell = CRATE_OK;
-                        *next_cell = NONE;
-                        mario_cell += 12;
-                        break;
-                    }
-
+                    go(DIR_DOWN, &mario_cell, map);
                     break;
-                }
-                case SDLK_LEFT: {
+
+                case SDLK_LEFT:
                     current = mario[DIR_LEFT];
-
-                    if (mario_cell % 12 == 0) break;  // Border
-                    Entity* next_cell = &map[mario_cell - 1];
-                    if (*next_cell == WALL) break;
-                    if (*next_cell == NONE || *next_cell == OBJECTIVE) {
-                        mario_cell -= 1;
-                        break;
-                    }
-
-                    // Next cell is a crate at this point
-                    bool has_next_next_cell = (mario_cell - 1) % 12 != 0;
-                    if (!has_next_next_cell) break;  // Crate against border
-
-                    Entity* next_next_cell = &map[mario_cell - 2];
-                    if (*next_next_cell == WALL || *next_next_cell == CRATE ||
-                        *next_next_cell == CRATE_OK)
-                        break;
-
-                    if (*next_next_cell == NONE) {
-                        swap(next_cell, next_next_cell);
-                        mario_cell -= 1;
-                        break;
-                    }
-
-                    if (*next_next_cell == OBJECTIVE) {
-                        *next_next_cell = CRATE_OK;
-                        *next_cell = NONE;
-                        mario_cell -= 1;
-                        break;
-                    }
-
+                    go(DIR_LEFT, &mario_cell, map);
                     break;
-                }
             }
         }
         SDL_RenderClear(renderer);
