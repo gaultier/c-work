@@ -106,8 +106,8 @@ int main(int argc, const char* argv[]) {
     const int map_file = open(argv[1], O_RDONLY);
     if (!map_file) exit(1);
 
-    uint8_t map_io[12 * 12] = {0};
-    const ssize_t read_res = read(map_file, map_io, 12 * 12);
+    uint8_t map_io[3 * 12 * 12] = {0};
+    const ssize_t read_res = read(map_file, map_io, 3 * 12 * 12);
     if (read_res == 0) exit(1);
     close(map_file);
 
@@ -273,7 +273,7 @@ int main(int argc, const char* argv[]) {
                 .colorScheme = NULL};
             int button_id = 0;
             SDL_ShowMessageBox(&message_box, &button_id);
-            running = false;
+            for (uint8_t i = 0; i < 144; i++) map[i] = map_io[144 + i];
         }
     }
     SDL_DestroyTexture(mario[0]);
