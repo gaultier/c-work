@@ -138,12 +138,13 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
 int main(int argc, const char* argv[]) {
     if (argc != 2) return 0;
 
-    const int map_file = open(argv[1], O_RDONLY);
+    int map_file = open(argv[1], O_RDONLY);
     if (!map_file) exit(1);
 
     uint8_t map_io[3 * 12 * 12] = {0};
     uint8_t level_count = 0;
     ssize_t read_res = read(map_file, &level_count, 1);
+    if (read_res == 0) exit(1);
     read_res = read(map_file, map_io, 3 * 12 * 12);
     if (read_res == 0) exit(1);
     close(map_file);
@@ -237,6 +238,20 @@ int main(int argc, const char* argv[]) {
                                &objectives_count, map_backup,
                                &mario_cell_backup);
                     break;
+                case SDLK_F9: {
+                    map_file = open(argv[1], O_RDONLY);
+                    if (!map_file) exit(1);
+                    read_res = read(map_file, &level_count, 1);
+                    if (read_res == 0) exit(1);
+                    read_res = read(map_file, map_io, 3 * 12 * 12);
+                    if (read_res == 0) exit(1);
+                    close(map_file);
+                    load_level(map_io, map, level, &mario_cell, &crates_count,
+                               &objectives_count, map_backup,
+                               &mario_cell_backup);
+
+                    break;
+                }
                 case SDLK_UP:
                     current = mario[DIR_UP];
                     go(DIR_UP, &mario_cell, map);
