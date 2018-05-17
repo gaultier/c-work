@@ -15,6 +15,10 @@ uint8_t get_next_cell_i(Direction dir, uint8_t cell);
 bool is_at_border(Direction direction, uint8_t cell);
 void go(Direction dir, uint8_t* cell, Entity map[144]);
 uint8_t count(Entity entity, Entity map[144]);
+int load_level(const uint8_t map_io[3 * 144], Entity map[144], uint8_t level,
+               uint8_t* mario_cell, uint8_t* crates_count,
+               uint8_t* objectives_count, Entity map_backup[144],
+               uint8_t* mario_cell_backup);
 
 void swap(Entity* a, Entity* b) {
     Entity tmp = *a;
@@ -55,6 +59,37 @@ uint8_t count(Entity entity, Entity map[144]) {
         if (map[i] == entity) c++;
     };
     return c;
+}
+
+int load_level(const uint8_t map_io[3 * 144], Entity map[144], uint8_t level,
+               uint8_t* mario_cell, uint8_t* crates_count,
+               uint8_t* objectives_count, Entity map_backup[144],
+               uint8_t* mario_cell_backup) {
+    for (uint8_t i = 0; i < 144; i++) map[i] = map_io[144 * level + i];
+
+    Entity* const mario_map = memchr(map, MARIO, 12 * 12);
+    if (!mario_map) {
+        fprintf(stderr, "Mario missing from map\n");
+        return -1;
+    }
+    *mario_cell = (uint8_t)(mario_map - map);
+    *mario_map = NONE;
+
+    *crates_count = count(CRATE, map);
+    *objectives_count = count(OBJECTIVE, map);
+
+    if (*objectives_count == 0 || *objectives_count != *crates_count) {
+        fprintf(
+            stderr,
+            "Map error: the number of objectives is 0 or does not match the "
+            "crates number (%u != %u)\n",
+            *objectives_count, *crates_count);
+        return -1;
+    }
+    for (uint8_t i = 0; i < 144; i++) map_backup[i] = map[i];
+    *mario_cell_backup = *mario_cell;
+
+    return 0;
 }
 
 void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
@@ -112,34 +147,11 @@ int main(int argc, const char* argv[]) {
     close(map_file);
 
     Entity map[144] = {NONE};
-    for (uint8_t i = 0; i < 144; i++) map[i] = map_io[i];
-
-    Entity* const mario_map = memchr(map, MARIO, 12 * 12);
-    if (!mario_map) {
-        fprintf(stderr, "Mario missing from map\n");
-        return 1;
-    }
-    uint8_t mario_cell = (uint8_t)(mario_map - map);
-    *mario_map = NONE;
-
-    uint8_t crates_count = 0;
-    for (uint8_t i = 0; i < 144; i++)
-        if (map[i] == CRATE) crates_count++;
-    uint8_t objectives_count = 0;
-    for (uint8_t i = 0; i < 144; i++)
-        if (map[i] == OBJECTIVE) objectives_count++;
-
-    if (objectives_count == 0 || objectives_count != crates_count) {
-        fprintf(
-            stderr,
-            "Map error: the number of objectives is 0 or does not match the "
-            "crates number (%u != %u)\n",
-            objectives_count, crates_count);
-        exit(1);
-    }
-    Entity map_backup[12 * 12] = {NONE};
-    for (uint8_t i = 0; i < 144; i++) map_backup[i] = map[i];
-    const uint8_t mario_cell_backup = mario_cell;
+    Entity map_backup[144] = {NONE};
+    uint8_t crates_count, objectives_count, mario_cell, mario_cell_backup,
+        level = 0;
+    load_level(map_io, map, level, &mario_cell, &crates_count,
+               &objectives_count, map_backup, &mario_cell_backup);
 
     IMG_Init(IMG_INIT_JPG);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) exit(1);
@@ -219,9 +231,9 @@ int main(int argc, const char* argv[]) {
                     running = false;
                     break;
                 case SDLK_r:
-                    for (uint8_t i = 0; i < 144; i++) map[i] = map_backup[i];
-                    mario_cell = mario_cell_backup;
-
+                    load_level(map_io, map, level, &mario_cell, &crates_count,
+                               &objectives_count, map_backup,
+                               &mario_cell_backup);
                     break;
                 case SDLK_UP:
                     current = mario[DIR_UP];
@@ -273,7 +285,10 @@ int main(int argc, const char* argv[]) {
                 .colorScheme = NULL};
             int button_id = 0;
             SDL_ShowMessageBox(&message_box, &button_id);
-            for (uint8_t i = 0; i < 144; i++) map[i] = map_io[144 + i];
+
+            level++;
+            load_level(map_io, map, level, &mario_cell, &crates_count,
+                       &objectives_count, map_backup, &mario_cell_backup);
         }
     }
     SDL_DestroyTexture(mario[0]);
