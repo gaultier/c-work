@@ -142,7 +142,9 @@ int main(int argc, const char* argv[]) {
     if (!map_file) exit(1);
 
     uint8_t map_io[3 * 12 * 12] = {0};
-    const ssize_t read_res = read(map_file, map_io, 3 * 12 * 12);
+    uint8_t level_count = 0;
+    ssize_t read_res = read(map_file, &level_count, 1);
+    read_res = read(map_file, map_io, 3 * 12 * 12);
     if (read_res == 0) exit(1);
     close(map_file);
 
@@ -275,20 +277,23 @@ int main(int argc, const char* argv[]) {
 
         uint8_t crates_ok_count = count(CRATE_OK, map);
         if (crates_ok_count == objectives_count) {
-            SDL_MessageBoxData message_box = {
-                .flags = SDL_MESSAGEBOX_INFORMATION,
-                .window = window,
-                .title = "You won!",
-                .message = "Yeah!",
-                .numbuttons = 0,
-                .buttons = NULL,
-                .colorScheme = NULL};
-            int button_id = 0;
-            SDL_ShowMessageBox(&message_box, &button_id);
-
-            level++;
-            load_level(map_io, map, level, &mario_cell, &crates_count,
-                       &objectives_count, map_backup, &mario_cell_backup);
+            if (level == level_count - 1) {
+                SDL_MessageBoxData message_box = {
+                    .flags = SDL_MESSAGEBOX_INFORMATION,
+                    .window = window,
+                    .title = "You won!",
+                    .message = "Yeah!",
+                    .numbuttons = 0,
+                    .buttons = NULL,
+                    .colorScheme = NULL};
+                int button_id = 0;
+                SDL_ShowMessageBox(&message_box, &button_id);
+                running = false;
+            } else {
+                level++;
+                load_level(map_io, map, level, &mario_cell, &crates_count,
+                           &objectives_count, map_backup, &mario_cell_backup);
+            }
         }
     }
     SDL_DestroyTexture(mario[0]);
