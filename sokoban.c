@@ -1,7 +1,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
 
 typedef enum { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } Direction;
 typedef enum { NONE, WALL, CRATE, CRATE_OK, OBJECTIVE, MARIO } Entity;
@@ -98,6 +102,45 @@ void go(Direction dir, uint8_t* mario_cell, Entity map[144]) {
 
 int main(int argc, const char* argv[]) {
     if (argc != 2) return 0;
+
+    const int map_file = open(argv[1], O_RDONLY);
+    if (!map_file) exit(1);
+
+    uint8_t map_io[12 * 12] = {0};
+    const ssize_t read_res = read(map_file, map_io, 12 * 12);
+    if (read_res == 0) exit(1);
+    close(map_file);
+
+    Entity map[144] = {NONE};
+    for (uint8_t i = 0; i < 144; i++) map[i] = map_io[i];
+
+    Entity* const mario_map = memchr(map, MARIO, 12 * 12);
+    if (!mario_map) {
+        fprintf(stderr, "Mario missing from map\n");
+        return 1;
+    }
+    uint8_t mario_cell = (uint8_t)(mario_map - map);
+    *mario_map = NONE;
+
+    uint8_t crates_count = 0;
+    for (uint8_t i = 0; i < 144; i++)
+        if (map[i] == CRATE) crates_count++;
+    uint8_t objectives_count = 0;
+    for (uint8_t i = 0; i < 144; i++)
+        if (map[i] == OBJECTIVE) objectives_count++;
+
+    if (objectives_count == 0 || objectives_count != crates_count) {
+        fprintf(
+            stderr,
+            "Map error: the number of objectives is 0 or does not match the "
+            "crates number (%u != %u)\n",
+            objectives_count, crates_count);
+        exit(1);
+    }
+    Entity map_backup[12 * 12] = {NONE};
+    for (uint8_t i = 0; i < 144; i++) map_backup[i] = map[i];
+    const uint8_t mario_cell_backup = mario_cell;
+
     IMG_Init(IMG_INIT_JPG);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) exit(1);
 
@@ -163,44 +206,6 @@ int main(int argc, const char* argv[]) {
     textures[OBJECTIVE] =
         SDL_CreateTextureFromSurface(renderer, objective_surface);
     SDL_FreeSurface(objective_surface);
-
-    FILE* map_file = fopen(argv[1], "r");
-    if (!map_file) exit(1);
-
-    unsigned char map_str[12 * 13] = {0};
-    Entity map[12 * 12] = {NONE};
-    uint64_t read_res = fread(map_str, 1, 12 * 13, map_file);
-    if (read_res == 0) exit(1);
-    fclose(map_file);
-
-    uint8_t mario_cell = 0;
-    uint8_t objectives_count = 0;
-    uint8_t crates_count = 0;
-    for (uint8_t i = 0, j = 0; j < 12 * 13; j++) {
-        if (map_str[j] == '\n') {
-            continue;
-        }
-
-        map[i] = (Entity)(map_str[j] - '0');
-        if (map[i] == MARIO) {
-            mario_cell = i;
-            map[i] = NONE;
-        } else if (map[i] == CRATE)
-            crates_count++;
-        else if (map[i] == OBJECTIVE)
-            objectives_count++;
-        i++;
-    };
-    if (objectives_count == 0 || objectives_count != crates_count) {
-        fprintf(
-            stderr,
-            "Map error: the number of objectives is 0 or does not match the "
-            "crates number\n");
-        exit(1);
-    }
-    Entity map_backup[12 * 12] = {NONE};
-    for (uint8_t i = 0; i < 144; i++) map_backup[i] = map[i];
-    const uint8_t mario_cell_backup = mario_cell;
 
     bool running = true;
     while (running) {
