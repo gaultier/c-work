@@ -1,6 +1,26 @@
 [
   {
     "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 parens.c -o build/debug/parens",
+    "file": "parens.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 house.c -o build/debug/house",
+    "file": "house.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c dict.c -o build/debug/dict.o",
+    "file": "dict.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99  build/debug/dict.o build/debug/utils.o -o build/debug/dict",
+    "file": "build/debug/dict.o"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -O2 -std=c99 -c dict.c -o build/release/dict.o",
     "file": "dict.c"
   },
@@ -8,6 +28,16 @@
     "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -O2 -std=c99  build/release/dict.o build/release/utils.o -o build/release/dict",
     "file": "build/release/dict.o"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c dict_read.c -o build/debug/dict_read.o",
+    "file": "dict_read.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99  build/debug/dict_read.o build/debug/utils.o -o build/debug/dict_read",
+    "file": "build/debug/dict_read.o"
   },
   {
     "directory": "/Users/pgaultier/c-work",
@@ -21,8 +51,23 @@
   },
   {
     "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c utils.c -o build/debug/utils.o",
+    "file": "utils.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -O2 -std=c99 -c utils.c -o build/release/utils.o",
     "file": "utils.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c airplane.c -o build/debug/airplane.o",
+    "file": "airplane.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc  -Wno-disabled-macro-expansion -lcurl build/debug/airplane.o -o build/debug/airplane",
+    "file": "build/debug/airplane.o"
   },
   {
     "directory": "/Users/pgaultier/c-work",
@@ -36,6 +81,16 @@
   },
   {
     "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c sokoban.c -o build/debug/sokoban.o",
+    "file": "sokoban.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -lSDL2 -lSDL2_image build/debug/sokoban.o -o build/debug/sokoban",
+    "file": "build/debug/sokoban.o"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -O2 -std=c99 -c sokoban.c -o build/release/sokoban.o",
     "file": "sokoban.c"
   },
@@ -43,5 +98,10 @@
     "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -O2 -std=c99 -lSDL2 -lSDL2_image build/release/sokoban.o -o build/release/sokoban",
     "file": "build/release/sokoban.o"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 sudoku.c -o build/debug/sudoku",
+    "file": "sudoku.c"
   }
 ]

@@ -54,3 +54,7 @@ build build/debug/sokoban: link_debug build/debug/sokoban.o
 build build/release/sokoban.o: cc_o_release sokoban.c
 build build/release/sokoban: link_release build/release/sokoban.o
     ldflags =  -lSDL2 -lSDL2_image
+
+build build/debug/sudoku: cc_debug sudoku.c
+build build/release/sudoku: cc_release sudoku.c
+
