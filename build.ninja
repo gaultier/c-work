@@ -19,6 +19,10 @@ rule link_debug
 rule link_release
   command = gcc $cflags_release $ldflags $in -o $out
 
+
+build build/debug/sales_commission: cc_debug sales_commission.c
+build build/release/sales_commission: cc_release sales_commission.c
+
 build build/debug/parens: cc_debug parens.c
 build build/release/parens: cc_release parens.c
 

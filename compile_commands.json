@@ -1,6 +1,11 @@
 [
   {
     "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 sales_commission.c -o build/debug/sales_commission",
+    "file": "sales_commission.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -g -O0 -std=c99 parens.c -o build/debug/parens",
     "file": "parens.c"
   },
