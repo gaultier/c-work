@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +29,15 @@ int main() {
             }
 
             printf("|%s|\n", token);
-            people[people_count++] = strdup(token);
+
+            bool found = false;
+            for (uint8_t i = 0; i < people_count; i++)
+                if (!strcmp(people[i], token)) {
+                    found = true;
+                    break;
+                }
+
+            if (!found) people[people_count++] = strdup(token);
         }
     }
 
