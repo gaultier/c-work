@@ -80,4 +80,11 @@ int main() {
         printf("\n");
         token_count = 0;
     }
+
+    char** people = tokens[0];
+    uint8_t people_count = 0;
+    while (people[++people_count] != NULL)
+        ;
+    printf("# of people: %hhu\n", people_count);
+    /* tokens++; */
 }
