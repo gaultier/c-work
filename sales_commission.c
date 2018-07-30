@@ -86,5 +86,18 @@ int main() {
     while (people[++people_count] != NULL)
         ;
     printf("# of people: %hhu\n", people_count);
-    /* tokens++; */
+    uint8_t article_count = 0;
+
+    while (strcmp(tokens[1 + article_count][0] , people[0]) != 0) 
+        article_count++;
+    
+    printf("# of article: %hhu\n", article_count);
+    /* for (uint8_t p = 0; p < people_count; p++) */
+    /*     printf("Handling person %s\n", people[p]); */
+    /*     for (uint8_t a = 1; a++, a < people_count + 1 ) */
+    /*     { */
+    /*         printf("Treating article %s\n", tokens[a] */
+
+    /*     } */
+
 }
