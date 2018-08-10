@@ -5,58 +5,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* typedef struct { */
-/*     char* name; */
-/*     int64_t amount; */
-/* } Item; */
-
-/* typedef enum { S_PEOPLE, S_REVENUE, S_EXPENSES } Section; */
-
 int main() {
+    const uint8_t max_size = 100;
+    char* tokens[max_size];
+    uint8_t line_count = 0;
+    uint8_t token_counts[max_size];
+    uint8_t token_count = 0;
+
     char* line = NULL;
     size_t line_cap = 0;
     ssize_t line_length;
-    const uint8_t max_size = 100;
-    char* tokens[max_size][max_size];
-    uint8_t line_count = 0;
-
-    /* char* people[max_size]; */
-    /* uint8_t people_count = 0; */
-    /* Item revenue[max_size]; */
-    /* uint8_t revenue_count = 0; */
-    /* Item expenses[max_size]; */
-    /* uint8_t expenses_count = 0; */
-
-    /* Section section = S_PEOPLE; */
-
-    /* if (section == S_PEOPLE) */
-    /*           people[people_count++] = strdup(token); */
-    /*       else if (section == S_REVENUE) { */
-    /*           if (token_count == 0) */
-    /*               first_token = strdup(token); */
-    /*           else */
-    /*               revenue[revenue_count++] = */
-    /*                   (Item){.name = first_token, */
-    /*                          .amount = strtoll(token, NULL, 10)}; */
-
-    /*       } else { */
-    /*           if (token_count == 0) */
-    /*               first_token = strdup(token); */
-    /*           else */
-    /*               expenses[expenses_count++] = */
-    /*                   (Item){.name = first_token, */
-    /*                          .amount = strtoll(token, NULL, 10)}; */
-    /*       } */
-
     while ((line_length = getline(&line, &line_cap, stdin)) > 0) {
         if (!memcmp(line, "Revenue", sizeof("Revenue") - 1)) continue;
-
         if (!memcmp(line, "Expenses", sizeof("Expenses") - 1)) continue;
-
         if (line_length == 1 && line[0] == '\n') continue;
 
         char* token;
-        uint8_t token_count = 0;
+        uint8_t line_token_count = 0;
         while ((token = strsep(&line, " ")) != NULL) {
             if (*token == '\0') continue;
             uint64_t token_size = strlen(token);
@@ -65,39 +30,33 @@ int main() {
                 token_size--;
             }
 
-            printf("|%s|\n", token);
-            tokens[line_count][token_count++] = strdup(token);
+            tokens[token_count] = strdup(token);
+            line_token_count++;
+            token_count++;
         }
-        tokens[line_count][token_count++] = NULL;
+        token_counts[line_count] = line_token_count;
         line_count++;
     }
 
-    char* token;
-    uint8_t token_count = 0;
-    for (uint8_t l = 0; l < line_count; l++) {
-        while ((token = tokens[l][token_count++]) != NULL)
-            printf("[%s]", token);
-        printf("\n");
-        token_count = 0;
+    uint8_t people_count = token_counts[0];
+    char** people = &tokens[0];
+    uint8_t article_count = (line_count - 2) / 2;
+    char** revenues = &tokens[people_count];
+    char** expenses =
+        &tokens[people_count + (1 + people_count) * article_count +
+                people_count];
+
+    for (uint8_t p = 0; p < people_count; p++) {
+        double commission = 0;
+        for (uint8_t a = 0; a < article_count; a++) {
+            int64_t revenue =
+                strtoll(revenues[(1 + people_count) * a + 1 + p], NULL, 10);
+            int64_t expense =
+                strtoll(expenses[(1 + people_count) * a + 1 + p], NULL, 10);
+            int64_t benefit = revenue - expense;
+            double com = benefit * 0.062;
+            if (com > 0) commission += com;
+        }
+        printf("#Person %s: %.2f\n", people[p], commission);
     }
-
-    char** people = tokens[0];
-    uint8_t people_count = 0;
-    while (people[++people_count] != NULL)
-        ;
-    printf("# of people: %hhu\n", people_count);
-    uint8_t article_count = 0;
-
-    while (strcmp(tokens[1 + article_count][0] , people[0]) != 0) 
-        article_count++;
-    
-    printf("# of article: %hhu\n", article_count);
-    /* for (uint8_t p = 0; p < people_count; p++) */
-    /*     printf("Handling person %s\n", people[p]); */
-    /*     for (uint8_t a = 1; a++, a < people_count + 1 ) */
-    /*     { */
-    /*         printf("Treating article %s\n", tokens[a] */
-
-    /*     } */
-
 }
