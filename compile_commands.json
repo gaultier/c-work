@@ -6,6 +6,11 @@
   },
   {
     "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 sales_commission2.c -o build/debug/sales_commission2",
+    "file": "sales_commission2.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -g -O0 -std=c99 parens.c -o build/debug/parens",
     "file": "parens.c"
   },
@@ -108,5 +113,10 @@
     "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -g -O0 -std=c99 sudoku.c -o build/debug/sudoku",
     "file": "sudoku.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 lox/main.c -o build/debug/lox",
+    "file": "lox/main.c"
   }
 ]
