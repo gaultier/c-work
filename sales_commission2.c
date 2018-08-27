@@ -11,16 +11,8 @@ typedef struct {
 } Token;
 
 uint64_t tokens_from_file(FILE* input, Token* tokens, uint64_t* token_count);
-void str_remove_spaces(char* str, uint64_t* size);
 char* get_cell_str(Token const* cells, uint64_t people_count, uint64_t person_i,
                    uint64_t article_i);
-
-void str_remove_spaces(char* str, uint64_t* size) {
-    while (isspace(str[*size - 1])) {
-        str[*size - 1] = '\0';
-        *size -= 1;
-    }
-}
 
 uint64_t tokens_from_file(FILE* input, Token* tokens, uint64_t* token_count) {
     uint8_t line_number = 0;
@@ -32,10 +24,8 @@ uint64_t tokens_from_file(FILE* input, Token* tokens, uint64_t* token_count) {
         if (line_length == 1 && line[0] == '\n') continue;
 
         char* token_str;
-        while ((token_str = strsep(&line, " ")) != NULL) {
-            uint64_t token_size = strlen(token_str);
-            str_remove_spaces(token_str, &token_size);
-            if (token_size == 0) continue;
+        while ((token_str = strsep(&line, " \n")) != NULL) {
+            if (token_str[0] == '\0') continue;
 
             Token* token = &tokens[*token_count];
             token->line_number = line_number;
