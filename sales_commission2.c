@@ -10,6 +10,7 @@
     } while (0)
 
 uint64_t split(char const* input, char*** names);
+void vec_free(char* v[], uint64_t count);
 
 uint64_t split(char const* input, char*** names) {
     char* token_str = NULL;
@@ -24,14 +25,22 @@ uint64_t split(char const* input, char*** names) {
     return size;
 }
 
-int main() {
+void vec_free(char* v[], uint64_t count) {
+    for (uint64_t i = 0; i < count; i++) free(v[i]);
+
+    free(v);
+}
+
+int main(int argc, char* argv[]) {
+    if (argc != 2) exit(1);
+    FILE* input_stream = fopen(argv[1], "r");
     size_t ignore = 0;
     ssize_t line_size = 0;
     char* line;
 
-    line_size = getline(&line, &ignore, stdin);  // Header `Revenue`
-    line_size = getline(&line, &ignore, stdin);  // Empty line
-    line_size = getline(&line, &ignore, stdin);  // Header list of names
+    line_size = getline(&line, &ignore, input_stream);  // Header `Revenue`
+    line_size = getline(&line, &ignore, input_stream);  // Empty line
+    line_size = getline(&line, &ignore, input_stream);  // Header list of names
 
     char** people = NULL;
     uint64_t people_count = split(line, &people);
@@ -41,7 +50,7 @@ int main() {
     char** articles = NULL;
     uint64_t articles_count = 0;
     do {
-        line_size = getline(&line, &ignore, stdin);
+        line_size = getline(&line, &ignore, input_stream);
 
         char** words = NULL;
         uint64_t words_count = 0;
@@ -53,16 +62,18 @@ int main() {
         for (uint64_t w_i = 1; w_i < words_count; w_i++)
             vec_add(revenues, revenues_count, words[w_i]);
 
+        free(words);
+
     } while (memmem(line, (uint64_t)line_size, "Expenses",
                     sizeof("Expenses") - 1) == NULL);
 
-    line_size = getline(&line, &ignore, stdin);  // Empty line
-    line_size = getline(&line, &ignore, stdin);  // Header list of people
+    line_size = getline(&line, &ignore, input_stream);  // Empty line
+    line_size = getline(&line, &ignore, input_stream);  // Header list of people
 
     char** expenses = NULL;
     uint64_t expenses_count = 0;
     do {
-        line_size = getline(&line, &ignore, stdin);
+        line_size = getline(&line, &ignore, input_stream);
 
         char** words = NULL;
         uint64_t words_count = 0;
@@ -72,6 +83,8 @@ int main() {
 
         for (uint64_t w_i = 1; w_i < words_count; w_i++)
             vec_add(expenses, expenses_count, words[w_i]);
+
+        free(words);
 
     } while (line_size > 0);
 
@@ -90,4 +103,9 @@ int main() {
         }
         printf("#Person %s: %.2f\n", people[p], commission_total);
     }
+
+    vec_free(people, people_count);
+    vec_free(revenues, revenues_count);
+    vec_free(expenses, revenues_count);
+    vec_free(articles, articles_count);
 }
