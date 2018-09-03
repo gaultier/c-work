@@ -65,6 +65,8 @@ build build/release/sokoban: link_release build/release/sokoban.o
 build build/debug/sudoku: cc_debug sudoku.c
 build build/release/sudoku: cc_release sudoku.c
 
-build build/debug/lox: cc_debug lox/main.c
-build build/release/lox: cc_release lox/main.c
+build build/debug/lex.o: cc_o_debug lox/lex.c
+build build/debug/lox.o: cc_o_debug lox/main.c
+build build/debug/lox: link_debug build/debug/lox.o build/debug/lex.o
+
 

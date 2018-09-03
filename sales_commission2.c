@@ -26,9 +26,13 @@ uint64_t split(char const* input, char*** names) {
 }
 
 void vec_free(char* v[], uint64_t count) {
-    for (uint64_t i = 0; i < count; i++) free(v[i]);
+    for (uint64_t i = 0; i < count; i++) {
+        free(v[i]);
+        v[i] = NULL;
+    }
 
     free(v);
+    v = NULL;
 }
 
 int main(int argc, char* argv[]) {

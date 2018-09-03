@@ -116,7 +116,17 @@
   },
   {
     "directory": "/Users/pgaultier/c-work",
-    "command": "gcc -Weverything -g -O0 -std=c99 lox/main.c -o build/debug/lox",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c lox/lex.c -o build/debug/lex.o",
+    "file": "lox/lex.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c lox/main.c -o build/debug/lox.o",
     "file": "lox/main.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99  build/debug/lox.o build/debug/lex.o -o build/debug/lox",
+    "file": "build/debug/lox.o"
   }
 ]
