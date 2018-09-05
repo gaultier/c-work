@@ -68,5 +68,11 @@ build build/release/sudoku: cc_release sudoku.c
 build build/debug/lex.o: cc_o_debug lox/lex.c
 build build/debug/lox.o: cc_o_debug lox/main.c
 build build/debug/lox: link_debug build/debug/lox.o build/debug/lex.o
+build build/debug/lex_test.o: cc_o_debug lox/lex_test.c
+build build/debug/lex_test: link_debug build/debug/lex_test.o build/debug/lex.o
 
-
+build build/release/lex.o: cc_o_release lox/lex.c
+build build/release/lox.o: cc_o_release lox/main.c
+build build/release/lox: link_release build/release/lox.o build/release/lex.o
+build build/release/lex_test.o: cc_o_release lox/lex_test.c
+build build/release/lex_test: link_release build/release/lex_test.o build/release/lex.o

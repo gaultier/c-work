@@ -128,5 +128,40 @@
     "directory": "/Users/pgaultier/c-work",
     "command": "gcc -Weverything -g -O0 -std=c99  build/debug/lox.o build/debug/lex.o -o build/debug/lox",
     "file": "build/debug/lox.o"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99 -c lox/lex_test.c -o build/debug/lex_test.o",
+    "file": "lox/lex_test.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -g -O0 -std=c99  build/debug/lex_test.o build/debug/lex.o -o build/debug/lex_test",
+    "file": "build/debug/lex_test.o"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -O2 -std=c99 -c lox/lex.c -o build/release/lex.o",
+    "file": "lox/lex.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -O2 -std=c99 -c lox/main.c -o build/release/lox.o",
+    "file": "lox/main.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -O2 -std=c99  build/release/lox.o build/release/lex.o -o build/release/lox",
+    "file": "build/release/lox.o"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -O2 -std=c99 -c lox/lex_test.c -o build/release/lex_test.o",
+    "file": "lox/lex_test.c"
+  },
+  {
+    "directory": "/Users/pgaultier/c-work",
+    "command": "gcc -Weverything -O2 -std=c99  build/release/lex_test.o build/release/lex.o -o build/release/lex_test",
+    "file": "build/release/lex_test.o"
   }
 ]

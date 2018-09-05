@@ -1,15 +1,21 @@
 .POSIX:
 .SUFFIXES:
 CC = cc
-CFLAGS = -Weverything -g -O0 -std=c99
+CFLAGS = -Weverything -std=c99
+CFLAGS_DEBUG = $(CFLAGS) -g -O0
+CFLAGS_RELEASE = $(CFLAGS) -O2
 
-all: build/debug/sales_commission 
+all: release
 
-build/debug/sales_commission: build/debug/sales_commission.o
-	$(CC) -o build/debug/sales_commission build/debug/sales_commission.o
+release: sales_commision_release
 
-build/debug/sales_commission.o: sales_commission.c
-	$(CC) -c $(CFLAGS) sales_commission.c build/debug/sales_commission.o
+sales_commision_release: sales_commission_release.o
+	$(CC) $(LDFLAGS) -o $@ $<
 
+sales_commission_release.o: sales_commission.c
+	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
+	
 clean:
-	rm -f build/debug/* 
+	rm -f *.o
+
+.PHONY: all clean debug
