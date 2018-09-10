@@ -14,6 +14,8 @@ typedef enum {
   TokenTypePlus,
   TokenTypeSemicolon,
   TokenTypeStar,
+  TokenTypeBang,
+  TokenTypeBangEqual,
 } TokenType;
 
 typedef union {

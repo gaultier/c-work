@@ -21,6 +21,17 @@ static void parse_digits(const char** current, Token* token) {
     *current += characters_count;
 }
 
+static char peekNext(const char* current) {
+    return current[0] == '\0' ? '\0' : current[1];
+}
+
+static bool match(const char** current, char character) {
+    if (peekNext(*current) != character) return false;
+
+    *current += 1;
+    return true;
+}
+
 void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
     const char* current = characters;
     while (*current != '\0') {
@@ -61,6 +72,10 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                     break;
                 case '*':
                     token.type = TokenTypeStar;
+                    break;
+                case '!':
+                    token.type = match(&current, '=') ? TokenTypeBangEqual
+                                                      : TokenTypeBang;
                     break;
             }
             vec_add(*tokens, *tokens_count, token);
