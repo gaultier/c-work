@@ -9,6 +9,11 @@ typedef enum {
   TokenTypeLeftBrace,
   TokenTypeRightBrace,
   TokenTypeComma,
+  TokenTypeDot,
+  TokenTypeMinus,
+  TokenTypePlus,
+  TokenTypeSemicolon,
+  TokenTypeStar,
 } TokenType;
 
 typedef union {

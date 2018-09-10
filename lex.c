@@ -47,6 +47,21 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                 case ',':
                     token.type = TokenTypeComma;
                     break;
+                case '.':
+                    token.type = TokenTypeDot;
+                    break;
+                case '-':
+                    token.type = TokenTypeMinus;
+                    break;
+                case '+':
+                    token.type = TokenTypePlus;
+                    break;
+                case ';':
+                    token.type = TokenTypeSemicolon;
+                    break;
+                case '*':
+                    token.type = TokenTypeStar;
+                    break;
             }
             vec_add(*tokens, *tokens_count, token);
             current += 1;
