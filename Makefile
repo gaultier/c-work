@@ -7,7 +7,7 @@ CFLAGS_RELEASE = $(CFLAGS) -O2
 
 all: release
 
-release: sales_commission_release sales_commission2_release parens_release
+release: sales_commission_release sales_commission2_release house_release sokoban_release lox_release
 
 sales_commission_release: sales_commission_release.o
 	$(CC) $(LDFLAGS) -o $@ $<
@@ -21,10 +21,25 @@ sales_commission2_release: sales_commission2_release.o
 sales_commission2_release.o: sales_commission2.c
 	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
 	
-parens_release: parens_release.o
+house_release: house_release.o
 	$(CC) $(LDFLAGS) -o $@ $<
 
-parens_release.o: parens.c
+house_release.o: house.c
+	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
+
+sokoban_release: sokoban_release.o
+	$(CC) $(LDFLAGS) -lSDL2 -lSDL2_image -o $@ $<
+
+sokoban_release.o: sokoban.c
+	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
+
+lox_release: lox_main_release.o lex_release.o
+	$(CC) $(LDFLAGS) -o $@ $^
+
+lox_main_release.o: lox.c lex.h
+	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
+
+lex_release.o: lex.c lex.h
 	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
 
 clean:
