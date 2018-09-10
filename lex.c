@@ -77,6 +77,18 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                     token.type = match(&current, '=') ? TokenTypeBangEqual
                                                       : TokenTypeBang;
                     break;
+                case '=':
+                    token.type = match(&current, '=') ? TokenTypeEqualEqual
+                                                      : TokenTypeEqual;
+                    break;
+                case '<':
+                    token.type = match(&current, '=') ? TokenTypeLessEqual
+                                                      : TokenTypeLess;
+                    break;
+                case '>':
+                    token.type = match(&current, '=') ? TokenTypeGreaterEqual
+                                                      : TokenTypeGreater;
+                    break;
             }
             vec_add(*tokens, *tokens_count, token);
             current += 1;
