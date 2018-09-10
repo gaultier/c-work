@@ -21,17 +21,29 @@ static void parse_digits(const char** current, Token* token) {
     *current += characters_count;
 }
 
+static void add_token(const char** current, Token* token, TokenType type) {
+    token->type = type;
+    *current += 1;
+}
+
 void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
     const char* current = characters;
     while (*current != '\0') {
+        printf("[L000] %p `%c`\n", current, *current);
         Token token = {.type = TokenTypeInvalid};
 
         if (char_is_digit(*current)) {
             parse_digits(&current, &token);
             vec_add(*tokens, *tokens_count, token);
-        } else
-            vec_add(*tokens, *tokens_count, token);
-
-        current++;
+        } else {
+            switch (*current) {
+                case '(':
+                    add_token(&current, &token, TokenTypeLeftParens);
+                    break;
+                default:
+                    vec_add(*tokens, *tokens_count, token);
+                    current += 1;
+            }
+        }
     }
 }

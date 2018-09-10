@@ -4,6 +4,8 @@
 typedef enum {
   TokenTypeInvalid,
   TokenTypeNumber,
+  TokenTypeLeftParens,
+  TokenTypeRightParens,
 } TokenType;
 
 typedef union {
@@ -11,8 +13,8 @@ typedef union {
 } TokenValue;
 
 typedef struct {
-  TokenType type;
   TokenValue value;
+  TokenType type;
 } Token;
 
 void tokenize(const char *characters, Token **tokens, uint64_t *tokens_count);
