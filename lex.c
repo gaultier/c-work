@@ -123,7 +123,7 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                     break;
                 case '/':
                     if (match(&current, '/')) {
-                        while (peekNext(current) != '\n' && *current != '\0')
+                        while (*current != '\n' && *current != '\0')
                             current += 1;
                     } else {
                         add_token(&current, tokens, tokens_count,
