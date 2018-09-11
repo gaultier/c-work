@@ -6,7 +6,7 @@
 #include "string.h"
 #include "vec.h"
 
-static bool char_is_digit(char c) { return c >= '0' && c <= '9'; }
+inline static bool char_is_digit(char c) { return c >= '0' && c <= '9'; }
 static uint64_t number(const char* current, double* value) {
     const uint64_t characters_count = strspn(current, "0123456789.");
     char* to_parse = malloc(characters_count + 1);
@@ -19,14 +19,12 @@ static uint64_t number(const char* current, double* value) {
     return characters_count;
 }
 
-static char peekNext(const char* current) {
+inline static char peekNext(const char* current) {
     return current[0] == '\0' ? '\0' : current[1];
 }
 
-static char peek(const char* current) { return current[0]; }
-
 static bool match(const char** current, char character) {
-    if (peek(*current) != character) return false;
+    if (**current != character) return false;
 
     *current += 1;
     return true;
