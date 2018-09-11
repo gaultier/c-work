@@ -7,18 +7,18 @@
 #include "vec.h"
 
 static bool char_is_digit(char c) { return c >= '0' && c <= '9'; }
-static void parse_digits(const char** current, Token* token) {
+static double parse_digits(const char** current) {
     const uint64_t characters_count = strspn(*current, "0123456789");
     char* to_parse = malloc(characters_count + 1);
     strncpy(to_parse, *current, characters_count);
     to_parse[characters_count] = '\0';
 
-    token->type = TokenTypeNumber;
-    token->value.number = strtoll(to_parse, NULL, 10);
+    const double parsed = strtoll(to_parse, NULL, 10);
 
     free(to_parse);
 
     *current += characters_count;
+    return parsed;
 }
 
 static char peekNext(const char* current) {
@@ -32,66 +32,107 @@ static bool match(const char** current, char character) {
     return true;
 }
 
+static void add_token_with_value(const char** characters, Token** tokens,
+                                 uint64_t* tokens_count, TokenType type,
+                                 TokenValue value)
+
+{
+    Token token = {.type = type, .value = value};
+    vec_add(*tokens, *tokens_count, token);
+    *characters += 1;
+}
+
+static void add_token(const char** characters, Token** tokens,
+                      uint64_t* tokens_count, TokenType type)
+
+{
+    const TokenValue value = {};
+    add_token_with_value(characters, tokens, tokens_count, type, value);
+}
+
+static char consume_token(const char** current) {
+    *current += 1;
+    return **current;
+}
+
 void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
     const char* current = characters;
     while (*current != '\0') {
         printf("[L000] %p `%c`\n", (const void*)current, *current);
-        Token token = {.type = TokenTypeInvalid};
 
         if (char_is_digit(*current)) {
-            parse_digits(&current, &token);
-            vec_add(*tokens, *tokens_count, token);
+            const TokenValue value = {.number = parse_digits(&current)};
+            add_token_with_value(&current, tokens, tokens_count,
+                                 TokenTypeNumber, value);
         } else {
             switch (*current) {
                 case '(':
-                    token.type = TokenTypeLeftParens;
+                    add_token(&current, tokens, tokens_count,
+                              TokenTypeLeftParens);
                     break;
                 case ')':
-                    token.type = TokenTypeRightParens;
+                    add_token(&current, tokens, tokens_count,
+                              TokenTypeRightParens);
                     break;
                 case '{':
-                    token.type = TokenTypeLeftBrace;
+                    add_token(&current, tokens, tokens_count,
+                              TokenTypeLeftBrace);
                     break;
                 case '}':
-                    token.type = TokenTypeRightBrace;
+                    add_token(&current, tokens, tokens_count,
+                              TokenTypeRightBrace);
                     break;
                 case ',':
-                    token.type = TokenTypeComma;
+                    add_token(&current, tokens, tokens_count, TokenTypeComma);
                     break;
                 case '.':
-                    token.type = TokenTypeDot;
+                    add_token(&current, tokens, tokens_count, TokenTypeDot);
                     break;
                 case '-':
-                    token.type = TokenTypeMinus;
+                    add_token(&current, tokens, tokens_count, TokenTypeMinus);
                     break;
                 case '+':
-                    token.type = TokenTypePlus;
+                    add_token(&current, tokens, tokens_count, TokenTypePlus);
                     break;
                 case ';':
-                    token.type = TokenTypeSemicolon;
+                    add_token(&current, tokens, tokens_count,
+                              TokenTypeSemicolon);
                     break;
                 case '*':
-                    token.type = TokenTypeStar;
+                    add_token(&current, tokens, tokens_count, TokenTypeStar);
                     break;
                 case '!':
-                    token.type = match(&current, '=') ? TokenTypeBangEqual
-                                                      : TokenTypeBang;
+                    add_token(&current, tokens, tokens_count,
+                              match(&current, '=') ? TokenTypeBangEqual
+                                                   : TokenTypeBang);
                     break;
                 case '=':
-                    token.type = match(&current, '=') ? TokenTypeEqualEqual
-                                                      : TokenTypeEqual;
+                    add_token(&current, tokens, tokens_count,
+                              match(&current, '=') ? TokenTypeEqualEqual
+                                                   : TokenTypeEqual);
                     break;
                 case '<':
-                    token.type = match(&current, '=') ? TokenTypeLessEqual
-                                                      : TokenTypeLess;
+                    add_token(&current, tokens, tokens_count,
+                              match(&current, '=') ? TokenTypeLessEqual
+                                                   : TokenTypeLess);
                     break;
                 case '>':
-                    token.type = match(&current, '=') ? TokenTypeGreaterEqual
-                                                      : TokenTypeGreater;
+                    add_token(&current, tokens, tokens_count,
+                              match(&current, '=') ? TokenTypeGreaterEqual
+                                                   : TokenTypeGreater);
                     break;
+                case '/':
+                    if (match(&current, '/')) {
+                        while (peekNext(current) != '\n' && *current != '\0')
+                            current += 1;
+                    } else {
+                        add_token(&current, tokens, tokens_count,
+                                  TokenTypeSlash);
+                    }
+                    break;
+                default:
+                    add_token(&current, tokens, tokens_count, TokenTypeInvalid);
             }
-            vec_add(*tokens, *tokens_count, token);
-            current += 1;
         }
     }
 }

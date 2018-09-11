@@ -22,6 +22,7 @@ typedef enum {
   TokenTypeLessEqual,
   TokenTypeGreater,
   TokenTypeGreaterEqual,
+  TokenTypeSlash,
 } TokenType;
 
 typedef union {
