@@ -58,10 +58,8 @@ static const char* string(const char* characters) {
     while (*end != '\0' && *end != '"') end += 1;
     if (*end == '\0') exit(1);
 
-    printf("[S003] %ld\n", end - characters);
     char* result = strndup(characters + 1, (size_t)(end - characters));
     result[end - characters - 1] = '\0';
-    printf("[S001] `%s`\n", result);
 
     return result;
 }
@@ -69,7 +67,7 @@ static const char* string(const char* characters) {
 void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
     const char* current = characters;
     while (*current != '\0') {
-        printf("[L000] %p `%c`\n", (const void*)current, *current);
+        printf("[L000] `%c`\n", *current);
 
         if (char_is_digit(*current)) {
             TokenValue value = {0};
@@ -157,7 +155,6 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                     add_token_with_value(&current, tokens, tokens_count,
                                          TokenTypeString, value,
                                          strlen(value.string) + 2);
-                    printf("[S002] `%s`\n", current);
                 } break;
                 default:
                     add_token(&current, tokens, tokens_count, TokenTypeInvalid);
