@@ -7,18 +7,17 @@
 #include "vec.h"
 
 static bool char_is_digit(char c) { return c >= '0' && c <= '9'; }
-static double parse_digits(const char** current) {
+static uint64_t parse_digits(const char** current, double* value) {
     const uint64_t characters_count = strspn(*current, "0123456789");
     char* to_parse = malloc(characters_count + 1);
     strncpy(to_parse, *current, characters_count);
     to_parse[characters_count] = '\0';
-
-    const double parsed = strtoll(to_parse, NULL, 10);
+    printf("[L006] %llu `%s`\n", characters_count, to_parse);
+    *value = strtoll(to_parse, NULL, 10);
 
     free(to_parse);
 
-    *current += characters_count;
-    return parsed;
+    return characters_count;
 }
 
 static char peekNext(const char* current) {
@@ -34,12 +33,12 @@ static bool match(const char** current, char character) {
 
 static void add_token_with_value(const char** characters, Token** tokens,
                                  uint64_t* tokens_count, TokenType type,
-                                 TokenValue value)
+                                 TokenValue value, uint64_t characters_count)
 
 {
     Token token = {.type = type, .value = value};
     vec_add(*tokens, *tokens_count, token);
-    *characters += 1;
+    *characters += characters_count;
 }
 
 static void add_token(const char** characters, Token** tokens,
@@ -47,7 +46,7 @@ static void add_token(const char** characters, Token** tokens,
 
 {
     const TokenValue value = {};
-    add_token_with_value(characters, tokens, tokens_count, type, value);
+    add_token_with_value(characters, tokens, tokens_count, type, value, 1);
 }
 
 static char consume_token(const char** current) {
@@ -61,9 +60,11 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
         printf("[L000] %p `%c`\n", (const void*)current, *current);
 
         if (char_is_digit(*current)) {
-            const TokenValue value = {.number = parse_digits(&current)};
+            TokenValue value = {};
+            const uint64_t characters_count =
+                parse_digits(&current, &value.number);
             add_token_with_value(&current, tokens, tokens_count,
-                                 TokenTypeNumber, value);
+                                 TokenTypeNumber, value, characters_count);
         } else {
             switch (*current) {
                 case '(':
