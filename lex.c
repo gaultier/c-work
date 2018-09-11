@@ -7,12 +7,12 @@
 #include "vec.h"
 
 static bool char_is_digit(char c) { return c >= '0' && c <= '9'; }
-static uint64_t parse_digits(const char* current, double* value) {
-    const uint64_t characters_count = strspn(current, "0123456789");
+static uint64_t number(const char* current, double* value) {
+    const uint64_t characters_count = strspn(current, "0123456789.");
     char* to_parse = malloc(characters_count + 1);
     strncpy(to_parse, current, characters_count);
     to_parse[characters_count] = '\0';
-    *value = strtoll(to_parse, NULL, 10);
+    *value = strtod(to_parse, NULL);
 
     free(to_parse);
 
@@ -23,8 +23,10 @@ static char peekNext(const char* current) {
     return current[0] == '\0' ? '\0' : current[1];
 }
 
+static char peek(const char* current) { return current[0]; }
+
 static bool match(const char** current, char character) {
-    if (peekNext(*current) != character) return false;
+    if (peek(*current) != character) return false;
 
     *current += 1;
     return true;
@@ -32,25 +34,16 @@ static bool match(const char** current, char character) {
 
 static void add_token_with_value(const char** characters, Token** tokens,
                                  uint64_t* tokens_count, TokenType type,
-                                 TokenValue value, uint64_t characters_count)
-
-{
+                                 TokenValue value, uint64_t characters_count) {
     Token token = {.type = type, .value = value};
     vec_add(*tokens, *tokens_count, token);
     *characters += characters_count;
 }
 
 static void add_token(const char** characters, Token** tokens,
-                      uint64_t* tokens_count, TokenType type)
-
-{
+                      uint64_t* tokens_count, TokenType type) {
     const TokenValue value = {0};
     add_token_with_value(characters, tokens, tokens_count, type, value, 1);
-}
-
-static char consume_token(const char** current) {
-    *current += 1;
-    return **current;
 }
 
 static const char* string(const char* characters) {
@@ -71,8 +64,7 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
 
         if (char_is_digit(*current)) {
             TokenValue value = {0};
-            const uint64_t characters_count =
-                parse_digits(current, &value.number);
+            const uint64_t characters_count = number(current, &value.number);
             add_token_with_value(&current, tokens, tokens_count,
                                  TokenTypeNumber, value, characters_count);
         } else {

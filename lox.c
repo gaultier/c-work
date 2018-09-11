@@ -5,7 +5,7 @@
 int main() {
     uint64_t tokens_count = 0;
     Token* tokens = NULL;
-    tokenize("a 123!(){},.-+;*!!= = == < <= > >=// abc\n56/ \"hello\"+",
+    tokenize("a 123.456!(){},.-+;*!!= = == < <= > >=// abc\n56/ \"hello\"+",
              &tokens, &tokens_count);
 
     for (uint64_t i = 0; i < tokens_count; i++) {
