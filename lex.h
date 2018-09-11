@@ -24,6 +24,7 @@ typedef enum {
   TokenTypeGreaterEqual = 19,
   TokenTypeSlash = 20,
   TokenTypeString = 21,
+  TokenTypeIdentifier = 22,
 } TokenType;
 
 typedef union {

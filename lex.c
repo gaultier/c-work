@@ -19,15 +19,15 @@ static uint64_t number(const char* current, double* value) {
     return characters_count;
 }
 
-inline static char peekNext(const char* current) {
-    return current[0] == '\0' ? '\0' : current[1];
-}
-
 static bool match(const char** current, char character) {
     if (**current != character) return false;
 
     *current += 1;
     return true;
+}
+
+inline static bool is_alpha(char c) {
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
 }
 
 static void add_token_with_value(const char** characters, Token** tokens,
@@ -65,6 +65,8 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
             const uint64_t characters_count = number(current, &value.number);
             add_token_with_value(&current, tokens, tokens_count,
                                  TokenTypeNumber, value, characters_count);
+        } else if (is_alpha(*current)) {
+            add_token(&current, tokens, tokens_count, TokenTypeIdentifier);
         } else {
             switch (*current) {
                 case '(':
