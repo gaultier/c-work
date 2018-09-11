@@ -23,15 +23,17 @@ typedef enum {
   TokenTypeGreater = 18,
   TokenTypeGreaterEqual = 19,
   TokenTypeSlash = 20,
+  TokenTypeString = 21,
 } TokenType;
 
 typedef union {
   double number;
+  const char *string;
 } TokenValue;
 
 typedef struct {
-  TokenValue value;
   TokenType type;
+  TokenValue value;
 } Token;
 
 void tokenize(const char *characters, Token **tokens, uint64_t *tokens_count);
