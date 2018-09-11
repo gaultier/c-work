@@ -12,7 +12,6 @@ static uint64_t parse_digits(const char** current, double* value) {
     char* to_parse = malloc(characters_count + 1);
     strncpy(to_parse, *current, characters_count);
     to_parse[characters_count] = '\0';
-    printf("[L006] %llu `%s`\n", characters_count, to_parse);
     *value = strtoll(to_parse, NULL, 10);
 
     free(to_parse);
@@ -130,6 +129,15 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                         add_token(&current, tokens, tokens_count,
                                   TokenTypeSlash);
                     }
+                    break;
+                case ' ':
+                case '\r':
+                case '\t':
+                    current += 1;
+                    break;
+                case '\n':
+                    // TODO: line++
+                    current += 1;
                     break;
                 default:
                     add_token(&current, tokens, tokens_count, TokenTypeInvalid);
