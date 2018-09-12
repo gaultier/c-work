@@ -55,6 +55,13 @@ static const char* string(const char* characters) {
     return result;
 }
 
+static uint64_t identifier(const char* characters) {
+    const char* end = characters;
+    while (is_alpha(*end) || char_is_digit(*end)) end += 1;
+
+    return (uint64_t)(end - characters);
+}
+
 void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
     const char* current = characters;
     while (*current != '\0') {
@@ -66,7 +73,11 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
             add_token_with_value(&current, tokens, tokens_count,
                                  TokenTypeNumber, value, characters_count);
         } else if (is_alpha(*current)) {
-            add_token(&current, tokens, tokens_count, TokenTypeIdentifier);
+            TokenValue value = {0};
+            const uint64_t characters_count = identifier(current);
+            printf("[I001] %llu\n", characters_count);
+            add_token_with_value(&current, tokens, tokens_count,
+                                 TokenTypeIdentifier, value, characters_count);
         } else {
             switch (*current) {
                 case '(':
