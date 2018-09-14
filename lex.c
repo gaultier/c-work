@@ -54,7 +54,8 @@ static const char* string(const char* characters) {
     return result;
 }
 
-static uint64_t identifier(const char* characters, TokenType* type) {
+static uint64_t identifier(const char* characters, TokenType* type,
+                           TokenValue* value) {
     const char* end = characters;
     while (isalnum(*end) || *end == '_') end += 1;
 
@@ -67,12 +68,13 @@ static uint64_t identifier(const char* characters, TokenType* type) {
         if (i++ >= keywords_count - 1) break;
     }
 
-    if (i == keywords_count)
+    if (i == keywords_count) {
         *type = TokenTypeIdentifier;
-    else
+        value->string = ident;
+    } else {
         *type = TokenTypeAnd + i;
-
-    free(ident);
+        free(ident);
+    }
 
     return (uint64_t)(end - characters);
 }
@@ -80,8 +82,6 @@ static uint64_t identifier(const char* characters, TokenType* type) {
 void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
     const char* current = characters;
     while (*current != '\0') {
-        printf("[L000] `%c`\n", *current);
-
         if (isdigit(*current)) {
             TokenValue value = {0};
             const uint64_t characters_count = number(current, &value.number);
@@ -90,7 +90,8 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
         } else if (isalpha(*current) || *current == '_') {
             TokenValue value = {0};
             TokenType type;
-            const uint64_t characters_count = identifier(current, &type);
+            const uint64_t characters_count =
+                identifier(current, &type, &value);
             add_token_with_value(&current, tokens, tokens_count, type, value,
                                  characters_count);
         } else {
