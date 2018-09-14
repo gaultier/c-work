@@ -13,8 +13,7 @@ static const char* const keywords[] = {
 
 static uint64_t number(const char* current, double* value) {
     const uint64_t characters_count = strspn(current, "0123456789.");
-    char* to_parse = malloc(characters_count + 1);
-    strncpy(to_parse, current, characters_count);
+    char* to_parse = strndup(current, characters_count + 1);
     to_parse[characters_count] = '\0';
     *value = strtod(to_parse, NULL);
 

@@ -5,7 +5,7 @@
 int main() {
     uint64_t tokens_count = 0;
     Token* tokens = NULL;
-    tokenize("a b_c or and AND", &tokens, &tokens_count);
+    tokenize("a b_c or and AND 12.54 yes", &tokens, &tokens_count);
 
     for (uint64_t i = 0; i < tokens_count; i++) {
         if (tokens[i].type == TokenTypeNumber)
