@@ -25,6 +25,21 @@ typedef enum {
   TokenTypeSlash = 20,
   TokenTypeString = 21,
   TokenTypeIdentifier = 22,
+  TokenTypeAnd = 23,
+  TokenTypeClass = 24,
+  TokenTypeElse = 25,
+  TokenTypeFor = 26,
+  TokenTypeFun = 27,
+  TokenTypeIf = 28,
+  TokenTypeNil = 29,
+  TokenTypeOr = 30,
+  TokenTypePrint = 31,
+  TokenTypeReturn = 32,
+  TokenTypeSuper = 33,
+  TokenTypeThis = 34,
+  TokenTypeTrue = 35,
+  TokenTypeVar = 36,
+  TokenTypeWhile = 37,
 } TokenType;
 
 typedef union {

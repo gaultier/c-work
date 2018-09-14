@@ -6,6 +6,10 @@
 #include "string.h"
 #include "vec.h"
 
+static const char* const keywords[] = {
+    "and",   "class",  "else",  "for",  "fun",  "if",  "nil",  "or",
+    "print", "return", "super", "this", "true", "var", "while"};
+
 inline static bool char_is_digit(char c) { return c >= '0' && c <= '9'; }
 static uint64_t number(const char* current, double* value) {
     const uint64_t characters_count = strspn(current, "0123456789.");
@@ -55,9 +59,25 @@ static const char* string(const char* characters) {
     return result;
 }
 
-static uint64_t identifier(const char* characters) {
+static uint64_t identifier(const char* characters, TokenType* type) {
     const char* end = characters;
     while (is_alpha(*end) || char_is_digit(*end)) end += 1;
+
+    char* const ident = strndup(characters, (uint64_t)(end - characters + 1));
+    ident[end - characters] = '\0';
+
+    size_t keywords_count = sizeof(keywords) / sizeof(const char*);
+    uint8_t i = 0;
+    while (strcmp(keywords[i], ident) != 0) {
+        if (i++ >= keywords_count - 1) break;
+    }
+
+    if (i == keywords_count)
+        *type = TokenTypeIdentifier;
+    else
+        *type = TokenTypeAnd + i;
+
+    free(ident);
 
     return (uint64_t)(end - characters);
 }
@@ -74,10 +94,10 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                                  TokenTypeNumber, value, characters_count);
         } else if (is_alpha(*current)) {
             TokenValue value = {0};
-            const uint64_t characters_count = identifier(current);
-            printf("[I001] %llu\n", characters_count);
-            add_token_with_value(&current, tokens, tokens_count,
-                                 TokenTypeIdentifier, value, characters_count);
+            TokenType type;
+            const uint64_t characters_count = identifier(current, &type);
+            add_token_with_value(&current, tokens, tokens_count, type, value,
+                                 characters_count);
         } else {
             switch (*current) {
                 case '(':
