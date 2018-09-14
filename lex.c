@@ -46,7 +46,10 @@ static void add_token(const char** characters, Token** tokens,
 static const char* string(const char* characters) {
     const char* end = characters + 1;
     while (*end != '\0' && *end != '"') end += 1;
-    if (*end == '\0') exit(1);
+    if (*end == '\0') {
+        printf("Unterminated string literal: `%s`\n", characters);
+        exit(1);
+    }
 
     char* result = strndup(characters + 1, (size_t)(end - characters));
     result[end - characters - 1] = '\0';
@@ -176,6 +179,7 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
                                          strlen(value.string) + 2);
                 } break;
                 default:
+                    printf("Unknown token found: `%c`\n", current[0]);
                     add_token(&current, tokens, tokens_count, TokenTypeInvalid);
             }
         }
