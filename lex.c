@@ -1,4 +1,5 @@
 #include "lex.h"
+#include <ctype.h>
 #include <inttypes.h>
 #include "stdbool.h"
 #include "stdio.h"
@@ -10,7 +11,6 @@ static const char* const keywords[] = {
     "and",   "class",  "else",  "for",  "fun",  "if",  "nil",  "or",
     "print", "return", "super", "this", "true", "var", "while"};
 
-inline static bool char_is_digit(char c) { return c >= '0' && c <= '9'; }
 static uint64_t number(const char* current, double* value) {
     const uint64_t characters_count = strspn(current, "0123456789.");
     char* to_parse = malloc(characters_count + 1);
@@ -28,10 +28,6 @@ static bool match(const char** current, char character) {
 
     *current += 1;
     return true;
-}
-
-inline static bool is_alpha(char c) {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
 }
 
 static void add_token_with_value(const char** characters, Token** tokens,
@@ -61,7 +57,7 @@ static const char* string(const char* characters) {
 
 static uint64_t identifier(const char* characters, TokenType* type) {
     const char* end = characters;
-    while (is_alpha(*end) || char_is_digit(*end)) end += 1;
+    while (isalnum(*end) || *end == '_') end += 1;
 
     char* const ident = strndup(characters, (uint64_t)(end - characters + 1));
     ident[end - characters] = '\0';
@@ -87,12 +83,12 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
     while (*current != '\0') {
         printf("[L000] `%c`\n", *current);
 
-        if (char_is_digit(*current)) {
+        if (isdigit(*current)) {
             TokenValue value = {0};
             const uint64_t characters_count = number(current, &value.number);
             add_token_with_value(&current, tokens, tokens_count,
                                  TokenTypeNumber, value, characters_count);
-        } else if (is_alpha(*current)) {
+        } else if (isalpha(*current) || *current == '_') {
             TokenValue value = {0};
             TokenType type;
             const uint64_t characters_count = identifier(current, &type);
