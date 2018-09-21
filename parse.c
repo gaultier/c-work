@@ -61,7 +61,7 @@ static Expr* primary(const Token** current, const Token* tokens,
     return NULL;  // TODO
 }
 
-static Expr* expr_unary(Expr* op, Expr* right, const Token** current,
+static Expr* expr_unary(const Token* op, Expr* right, const Token** current,
                         const Token* tokens, uint64_t tokens_count) {
     return NULL;  // TODO
 }
