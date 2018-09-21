@@ -185,3 +185,126 @@ void tokenize(const char* characters, Token** tokens, uint64_t* tokens_count) {
         }
     }
 }
+
+void token_print(const Token* token) {
+    if (!token) return;
+
+    switch (token->type) {
+        case TokenTypeNumber:
+            printf("%f", token->value.number);
+            break;
+        case TokenTypeLeftParens:
+            printf("(");
+            break;
+        case TokenTypeRightParens:
+            printf(")");
+            break;
+        case TokenTypeLeftBrace:
+            printf("{");
+            break;
+        case TokenTypeRightBrace:
+            printf("}");
+            break;
+        case TokenTypeComma:
+            printf(",");
+            break;
+        case TokenTypeDot:
+            printf(".");
+            break;
+        case TokenTypeMinus:
+            printf("-");
+            break;
+        case TokenTypePlus:
+            printf("+");
+            break;
+        case TokenTypeSemicolon:
+            printf(";");
+            break;
+        case TokenTypeStar:
+            printf("*");
+            break;
+        case TokenTypeBang:
+            printf("!");
+            break;
+        case TokenTypeBangEqual:
+            printf("!=");
+            break;
+        case TokenTypeEqual:
+            printf("=");
+            break;
+        case TokenTypeEqualEqual:
+            printf("==");
+            break;
+        case TokenTypeLess:
+            printf("<");
+            break;
+        case TokenTypeLessEqual:
+            printf("<=");
+            break;
+        case TokenTypeGreater:
+            printf(">");
+            break;
+        case TokenTypeGreaterEqual:
+            printf(">=");
+            break;
+        case TokenTypeSlash:
+            printf("/");
+            break;
+        case TokenTypeString:
+            printf("\"%s\"", token->value.string);
+            break;
+        case TokenTypeIdentifier:
+            printf("%s", token->value.string);
+            break;
+        case TokenTypeAnd:
+            printf("and");
+            break;
+        case TokenTypeClass:
+            printf("class");
+            break;
+        case TokenTypeElse:
+            printf("else");
+            break;
+        case TokenTypeFor:
+            printf("for");
+            break;
+        case TokenTypeFun:
+            printf("fun");
+            break;
+        case TokenTypeIf:
+            printf("if");
+            break;
+        case TokenTypeNil:
+            printf("nil");
+            break;
+        case TokenTypeOr:
+            printf("or");
+            break;
+        case TokenTypePrint:
+            printf("print");
+            break;
+        case TokenTypeReturn:
+            printf("return");
+            break;
+        case TokenTypeSuper:
+            printf("super");
+            break;
+        case TokenTypeThis:
+            printf("this");
+            break;
+        case TokenTypeTrue:
+            printf("true");
+            break;
+        case TokenTypeVar:
+            printf("var");
+            break;
+        case TokenTypeWhile:
+            printf("while");
+            break;
+        case TokenTypeInvalid:
+            printf("<?>");
+            break;
+        default:
+            exit(1);
+    }
+}

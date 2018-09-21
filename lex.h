@@ -53,3 +53,4 @@ typedef struct {
 } Token;
 
 void tokenize(const char *characters, Token **tokens, uint64_t *tokens_count);
+void token_print(const Token* token);
