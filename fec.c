@@ -154,10 +154,11 @@ int main(int argc, char *argv[]) {
 
         const char *full_name, *most_common_full_name = NULL;
         uint64_t count, max_count = 0;
-        kh_foreach(names, full_name, count,
-                if (count > max_count) {
-            max_count = count; most_common_full_name = full_name);
-        }
+        kh_foreach(names, full_name, count, if (count > max_count) {
+            max_count = count;
+            most_common_full_name = full_name;
+        });
+
         printf("%s: %llu\n", most_common_full_name, max_count);
     }
 }
