@@ -6,7 +6,13 @@ CFLAGS_RELEASE = $(CFLAGS) -O2
 
 all: release debug
 
-release: sales_commission_release sales_commission2_release house_release sokoban_release lox_release
+release: sales_commission_release sales_commission2_release house_release sokoban_release lox_release fec_release
+
+fec_release: fec_release.o
+	$(CC) $(LDFLAGS) -o $@ $<
+
+fec_release.o: fec.c
+	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
 
 sales_commission_release: sales_commission_release.o
 	$(CC) $(LDFLAGS) -o $@ $<
@@ -44,7 +50,13 @@ lex_release.o: lex.c lex.h
 parse_release.o: parse.c parse.h
 	$(CC) $(CFLAGS_RELEASE) -c $< -o $@
 
-debug: sales_commission_debug sales_commission2_debug house_debug sokoban_debug lox_debug
+debug: sales_commission_debug sales_commission2_debug house_debug sokoban_debug lox_debug fec_debug
+
+fec_debug: fec_debug.o
+	$(CC) $(LDFLAGS) -o $@ $<
+
+fec_debug.o: fec.c
+	$(CC) $(CFLAGS_DEBUG) -c $< -o $@
 
 sales_commission_debug: sales_commission_debug.o
 	$(CC) $(LDFLAGS) -o $@ $<
