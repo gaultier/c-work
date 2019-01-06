@@ -139,22 +139,11 @@ int main(int argc, char *argv[]) {
                     }
                     token_count++;
                 }
-                char first_name[100];
-                bzero(first_name, 100);
-                char *start_first_name = strstr(full_name, ", ");
-
-                if (!start_first_name) {
-                    memcpy(first_name, full_name, 99);
-                } else {
-                    start_first_name += 2;
-                    uint64_t first_name_len = strcspn(start_first_name, " |");
-                    memcpy(first_name, start_first_name, first_name_len);
-                }
 
                 int absent;
-                k = kh_put(str, names, first_name, &absent);
+                k = kh_put(str, names, full_name, &absent);
                 if (absent) {
-                    kh_key(names, k) = strdup(first_name);
+                    kh_key(names, k) = strdup(full_name);
                     kh_value(names, k) = 1;
                 } else
                     kh_value(names, k)++;
@@ -163,12 +152,12 @@ int main(int argc, char *argv[]) {
                 f++;
         }
 
-        const char *first_name, *most_common_first_name = NULL;
+        const char *full_name, *most_common_full_name = NULL;
         uint64_t count, max_count = 0;
-        kh_foreach(names, first_name, count,
+        kh_foreach(names, full_name, count,
                 if (count > max_count) {
-            max_count = count; most_common_first_name = first_name);
+            max_count = count; most_common_full_name = full_name);
         }
-        printf("%s: %llu\n", most_common_first_name, max_count);
+        printf("%s: %llu\n", most_common_full_name, max_count);
     }
 }
