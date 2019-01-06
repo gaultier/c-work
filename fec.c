@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
                 k = kh_put(str, monthly_count, month, &absent);
                 if (absent) {
                     kh_key(monthly_count, k) = strdup(month);
-                    kh_value(monthly_count, k) = 0;
+                    kh_value(monthly_count, k) = 1;
                 } else
                     kh_value(monthly_count, k)++;
                 f = next_eol;
@@ -111,5 +111,64 @@ int main(int argc, char *argv[]) {
         uint64_t count;
         kh_foreach(monthly_count, month, count,
                    printf("%s: %llu\n", month, count));
+    }
+
+    // # 4: Most common first name in the data and how many times it occurs
+    if (strcmp(argv[1], "4") == 0) {
+        khiter_t k;
+        khash_t(str) *names = kh_init(str);
+
+        char *line = alloca(1024);
+        char *orig_line = line;
+        char *f = file;
+
+        while (f < file + file_size) {
+            if (f == file || *(f - 1) == '\n') {  // Start of line
+                char *next_eol = strchr(f, '\n');
+                line = orig_line;
+                memcpy(line, f, (next_eol - f));
+
+                char *token;
+                uint8_t token_count = 1;
+                char full_name[100];
+                while ((token = strsep(&line, "|")) != NULL) {
+                    if (token_count == 8) {
+                        strncpy(full_name, token, 99);
+                        full_name[99] = '\0';
+                        break;
+                    }
+                    token_count++;
+                }
+                char first_name[100];
+                bzero(first_name, 100);
+                char *start_first_name = strstr(full_name, ", ");
+
+                if (!start_first_name) {
+                    memcpy(first_name, full_name, 99);
+                } else {
+                    start_first_name += 2;
+                    uint64_t first_name_len = strcspn(start_first_name, " |");
+                    memcpy(first_name, start_first_name, first_name_len);
+                }
+
+                int absent;
+                k = kh_put(str, names, first_name, &absent);
+                if (absent) {
+                    kh_key(names, k) = strdup(first_name);
+                    kh_value(names, k) = 1;
+                } else
+                    kh_value(names, k)++;
+                f = next_eol;
+            } else
+                f++;
+        }
+
+        const char *first_name, *most_common_first_name = NULL;
+        uint64_t count, max_count = 0;
+        kh_foreach(names, first_name, count,
+                if (count > max_count) {
+            max_count = count; most_common_first_name = first_name);
+        }
+        printf("%s: %llu\n", most_common_first_name, max_count);
     }
 }
