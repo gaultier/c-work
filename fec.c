@@ -9,6 +9,9 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
+#ifdef WITH_JMALLOC
+#include <jemalloc/jemalloc.h>
+#endif
 
 int readFile(const char file_name[], char **str, uint64_t *size) {
     const int fd = open(file_name, O_RDONLY);
@@ -105,6 +108,10 @@ int main() {
         char *line = alloca(1024);
         char *orig_line = line;
         char *f = file;
+        char months[50][7];
+        bzero(months, 50 * 7);
+        uint64_t months_len = 0;
+
         while (f < file + file_size) {
             if (f == file || *(f - 1) == '\n') {  // Start of line
                 char *next_eol = strchr(f, '\n');
@@ -126,8 +133,10 @@ int main() {
                 int absent;
                 k = kh_put(str, monthly_count, month, &absent);
                 if (absent) {
-                    kh_key(monthly_count, k) = strdup(month);
+                    memcpy(months[months_len], month, 7);
+                    kh_key(monthly_count, k) = months[months_len];
                     kh_value(monthly_count, k) = 1;
+                    months_len++;
                 } else
                     kh_value(monthly_count, k)++;
                 f = next_eol;
@@ -199,4 +208,7 @@ int main() {
         printf("Time #4: %ld ms\n", (end.tv_sec - start.tv_sec) * 1000 +
                                         (end.tv_usec - start.tv_usec) / 1000);
     }
+#ifdef WITH_JMALLOC
+    malloc_stats_print(NULL, NULL, NULL);
+#endif
 }
