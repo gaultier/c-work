@@ -4,3 +4,5 @@ build
 *_debug*
 *.bin
 *.o
+a.out
+*.dSYM
