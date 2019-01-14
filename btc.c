@@ -29,45 +29,70 @@ static int readFile(const char file_name[], char** str, uint64_t* size) {
     return 0;
 }
 
+// To continue parsing the line, return 1.
+// To stop and go to the next line return 0.
+// To stop parsing the file return -1;
+static int line_cb(const char str[], uint64_t cell_number, const char line[]) {
+    if (cell_number == 1) {
+        char* end;
+        time_t timestamp = strtoll(str, &end, 10);
+        return (end && *end == '\0' && timestamp >= 1420070400);
+    } else if (cell_number == 2) {
+        if (strcmp(str, "NaN") == 0) return 0;
+        printf("%s\n", line);
+        return -1;
+    } else
+        return 0;
+}
+
+static int read_string_line_by_line(const char* str, uint64_t size,
+                                    int (*fn)(const char cell[],
+                                              uint64_t cell_number,
+                                              const char line[])) {
+    char* line = alloca(100);
+    char* orig_line = line;
+    const char* s = str;
+
+    while (s < str + size) {
+        if (s == str || *(s - 1) == '\n') {
+            char* next_eol = strchr(s, '\n');
+            // Move back the line pointer to the initial memory region
+            line = orig_line;
+            // Copy the line
+            memcpy(line, s, next_eol - s);
+            line[next_eol - s] = '\0';
+
+            // We need an immutable copy for the callback because strsep
+            // increments the line pointer (but does not modify the content
+            // pointed at)
+            char full_line[100];
+            memcpy(full_line, s, next_eol - s);
+            full_line[next_eol - s] = '\0';
+
+            char* token;
+            uint8_t token_count = 1;
+
+            while ((token = strsep(&line, ",")) != NULL) {
+                int res = fn(token, token_count, full_line);
+                if (res == 0)
+                    break;
+                else if (res == -1)
+                    return 0;
+                token_count++;
+            }
+            s = next_eol;
+        }
+        s++;
+    }
+    return 0;
+}
+
 int main(int argc, char* argv[]) {
+    if (argc != 2) return 1;
+
     char* file = NULL;
     uint64_t file_size = 0;
     if (readFile(argv[1], &file, &file_size) != 0) return errno;
 
-    char* line = alloca(1024);
-    char* orig_line = line;
-    char* f = file;
-
-    while (f < file + file_size) {
-        if (f == file || *(f - 1) == '\n') {
-            char* next_eol = strchr(f, '\n');
-            line = orig_line;
-            memcpy(line, f, (next_eol - f));
-
-            char* token;
-            uint8_t token_count = 1;
-            time_t timestamp = 0;
-            char* end = NULL;
-
-            while ((token = strsep(&line, ",")) != NULL) {
-                if (token_count == 1)
-                    timestamp = strtoll(token, &end, 10);
-                else if (token_count == 2 && strcmp(token, "NaN") == 0)
-                    break;
-                else if (token_count == 2) {
-                    if (end && *end == '\0' && timestamp >= 1420070400) {
-                        memcpy(line, f, next_eol - f);
-                        line[next_eol - f] = '\0';
-                        printf("%s", line);
-                        return 0;
-                    }
-                } else if (token_count > 2)
-                    break;
-
-                token_count++;
-            }
-            f = next_eol;
-        }
-        f++;
-    }
+    read_string_line_by_line(file, file_size, line_cb);
 }
