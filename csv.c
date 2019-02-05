@@ -37,21 +37,22 @@ static char* make_str_from(const char* src, size_t len) {
     return s;
 }
 
-int on_line(const char* line, size_t line_len, size_t line_no) {
+int on_line(const char* line, size_t line_len, size_t line_no, void* data) {
     printf("Line %zu: `%s`\n", line_no, line);
     return 0;
 }
 
-int on_cell(const char* cell, size_t cell_len, size_t cell_no) {
+int on_cell(const char* cell, size_t cell_len, size_t cell_no, void* data) {
     printf("Cell %zu: `%s`\n", cell_no, cell);
     return 0;
 }
 
 static int parse(const char file_name[], char sep,
                  int (*on_line)(const char* line, size_t line_len,
-                                size_t line_no),
+                                size_t line_no, void* data),
                  int (*on_cell)(const char* cell, size_t cell_len,
-                                size_t cell_no)) {
+                                size_t cell_no, void* data),
+                 void* data) {
     char* file = NULL;
     uint64_t file_size = 0;
     if (read_file(file_name, &file, &file_size) != 0) return errno;
@@ -72,14 +73,16 @@ static int parse(const char file_name[], char sep,
                 size_t cell_len = cur - start_cell;
                 char* cell = make_str_from(start_cell, cell_len);
 
-                if ((ret = on_cell(cell, cell_len, cell_no)) != 0) return ret;
+                if ((ret = on_cell(cell, cell_len, cell_no, data)) != 0)
+                    return ret;
                 free(cell);
             }
             {
                 size_t line_len = cur - start_line;
                 char* line = make_str_from(start_line, line_len);
 
-                if ((ret = on_line(line, line_len, line_no)) != 0) return ret;
+                if ((ret = on_line(line, line_len, line_no, data)) != 0)
+                    return ret;
 
                 free(line);
             }
@@ -94,7 +97,7 @@ static int parse(const char file_name[], char sep,
             size_t cell_len = cur - start_cell;
             char* cell = make_str_from(start_cell, cell_len);
 
-            if ((ret = on_cell(cell, cell_len, cell_no)) != 0) return ret;
+            if ((ret = on_cell(cell, cell_len, cell_no, data)) != 0) return ret;
             free(cell);
 
             start_cell = cur + 1;
@@ -113,5 +116,5 @@ int main(int argc, char* argv[]) {
 
     const char* file = argv[1];
     const char* sep = argv[2];
-    return parse(file, sep[0], on_line, on_cell);
+    return parse(file, sep[0], on_line, on_cell, NULL);
 }
