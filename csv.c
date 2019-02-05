@@ -30,19 +30,28 @@ static int read_file(const char file_name[], char** str, uint64_t* size) {
     return 0;
 }
 
-void on_line(const char* line, size_t line_len, size_t line_no) {
-    printf("Line %zu: `%s`\n", line_no, line);
+static char* make_str_from(const char* src, size_t len) {
+    char* s = malloc(len + 1);
+    memcpy(s, src, len + 1);
+    s[len] = '\0';
+    return s;
 }
 
-void on_cell(const char* cell, size_t cell_len, size_t cell_no) {
+int on_line(const char* line, size_t line_len, size_t line_no) {
+    printf("Line %zu: `%s`\n", line_no, line);
+    return 0;
+}
+
+int on_cell(const char* cell, size_t cell_len, size_t cell_no) {
     printf("Cell %zu: `%s`\n", cell_no, cell);
+    return 0;
 }
 
 static int parse(const char file_name[], char sep,
-                 void (*on_line)(const char* line, size_t line_len,
-                                 size_t line_no),
-                 void (*on_cell)(const char* cell, size_t cell_len,
-                                 size_t cell_no)) {
+                 int (*on_line)(const char* line, size_t line_len,
+                                size_t line_no),
+                 int (*on_cell)(const char* cell, size_t cell_len,
+                                size_t cell_no)) {
     char* file = NULL;
     uint64_t file_size = 0;
     if (read_file(file_name, &file, &file_size) != 0) return errno;
@@ -53,43 +62,41 @@ static int parse(const char file_name[], char sep,
     bool inside_quotes = false;
     const char* start_cell = file;
     const char* start_line = file;
+    int ret = 0;
 
     while (cur < file + file_size) {
+        // TODO: handle last line without newline
+        // TODO handle "\r\n"
         if (*cur == '\n' && !inside_quotes) {
             {
                 size_t cell_len = cur - start_cell;
-                char* cell = malloc(cell_len + 1);
-                memcpy(cell, start_cell, cell_len + 1);
-                cell[cell_len] = '\0';
+                char* cell = make_str_from(start_cell, cell_len);
 
-                on_cell(cell, cell_len, cell_no);
+                if ((ret = on_cell(cell, cell_len, cell_no)) != 0) return ret;
                 free(cell);
             }
             {
                 size_t line_len = cur - start_line;
-                char* line = malloc(line_len + 1);
-                memcpy(line, start_line, line_len);
-                line[line_len] = '\0';
+                char* line = make_str_from(start_line, line_len);
 
-                on_line(line, line_len, line_no);
+                if ((ret = on_line(line, line_len, line_no)) != 0) return ret;
 
                 free(line);
             }
             start_line = cur + 1;
             start_cell = cur + 1;
             line_no++;
-            cell_no = 0;
+            cell_no = 1;
         } else if (*cur == '"') {
             if ((cur < file + file_size - 1) && *(cur + 1) != '"')
                 inside_quotes = !inside_quotes;
         } else if (*cur == sep && !inside_quotes) {
             size_t cell_len = cur - start_cell;
-            char* cell = malloc(cell_len + 1);
-            memcpy(cell, start_cell, cell_len + 1);
-            cell[cell_len] = '\0';
+            char* cell = make_str_from(start_cell, cell_len);
 
-            on_cell(cell, cell_len, cell_no);
+            if ((ret = on_cell(cell, cell_len, cell_no)) != 0) return ret;
             free(cell);
+
             start_cell = cur + 1;
             cell_no++;
         }
@@ -99,14 +106,12 @@ static int parse(const char file_name[], char sep,
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 6) {
-        printf("Usage: %s file separator cmd line column\n", argv[0]);
+    if (argc != 3) {
+        printf("Usage: %s file separator\n", argv[0]);
         return 1;
     }
 
     const char* file = argv[1];
     const char* sep = argv[2];
-    const char* cmd = argv[3];
-    if (strcmp(cmd, "print_cell") == 0)
-        return parse(file, sep[0], on_line, on_cell);
+    return parse(file, sep[0], on_line, on_cell);
 }
