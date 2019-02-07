@@ -9,6 +9,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+struct headers {
+    size_t size;
+    char** headers;
+};
+
 static int read_file(const char file_name[], char** str, uint64_t* size) {
     const int fd = open(file_name, O_RDONLY);
     if (fd == -1) return errno;
@@ -37,29 +42,53 @@ static char* make_str_from(const char* src, size_t len) {
     return s;
 }
 
-int on_line(const char* line, size_t line_len, size_t line_no, void* data) {
-    printf("Line %zu: `%s`\n", line_no, line);
+static int on_header(const char* header, size_t header_len, size_t header_no,
+                     size_t line_no, void* data) {
+    (void)header_len;
+    (void)line_no;
+    (void)data;
+    printf("Header: %zu: `%s`\n", header_no, header);
+
+    struct headers* h = (struct headers*)(data);
+    h->headers = realloc(h->headers, sizeof(char*) * (h->size + 1));
+    h->headers[header_no] = strdup(header);
     return 0;
 }
 
-int on_cell(const char* cell, size_t cell_len, size_t cell_no, void* data) {
-    printf("Cell %zu: `%s`\n", cell_no, cell);
+static int on_line(const char* line, size_t line_len, size_t line_no,
+                   void* data) {
+    (void)line_len;
+    (void)data;
+    printf("%zu: `%s`\n", line_no, line);
     return 0;
 }
 
+static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
+                   size_t line_no, void* data) {
+    (void)cell_len;
+    (void)data;
+    struct headers* h = (struct headers*)(data);
+    printf("%zu:%zu: %s: `%s`\n", line_no, cell_no, h->headers[cell_no], cell);
+    return 0;
+}
+
+// TODO: handle optional header
+// TODO: validate ?
 static int parse(const char file_name[], char sep,
+                 int (*on_header)(const char* header, size_t header_len,
+                                  size_t header_no, size_t line_no, void* data),
                  int (*on_line)(const char* line, size_t line_len,
                                 size_t line_no, void* data),
                  int (*on_cell)(const char* cell, size_t cell_len,
-                                size_t cell_no, void* data),
+                                size_t cell_no, size_t line_no, void* data),
                  void* data) {
     char* file = NULL;
     uint64_t file_size = 0;
     if (read_file(file_name, &file, &file_size) != 0) return errno;
 
     const char* cur = file;
-    size_t line_no = 1;
-    size_t cell_no = 1;
+    size_t line_no = 0;
+    size_t cell_no = 0;
     bool inside_quotes = false;
     const char* start_cell = file;
     const char* start_line = file;
@@ -70,15 +99,19 @@ static int parse(const char file_name[], char sep,
         // TODO handle "\r\n"
         if (*cur == '\n' && !inside_quotes) {
             {
-                size_t cell_len = cur - start_cell;
+                size_t cell_len = (size_t)(cur - start_cell);
                 char* cell = make_str_from(start_cell, cell_len);
+                // OPTIMIZE ?
+                if (line_no == 0 && on_header != NULL)
+                    ret = on_header(cell, cell_len, cell_no, line_no, data);
+                else
+                    ret = on_cell(cell, cell_len, cell_no, line_no, data);
 
-                if ((ret = on_cell(cell, cell_len, cell_no, data)) != 0)
-                    return ret;
+                if (ret != 0) return ret;
                 free(cell);
             }
             {
-                size_t line_len = cur - start_line;
+                size_t line_len = (size_t)(cur - start_line);
                 char* line = make_str_from(start_line, line_len);
 
                 if ((ret = on_line(line, line_len, line_no, data)) != 0)
@@ -94,10 +127,16 @@ static int parse(const char file_name[], char sep,
             if ((cur < file + file_size - 1) && *(cur + 1) != '"')
                 inside_quotes = !inside_quotes;
         } else if (*cur == sep && !inside_quotes) {
-            size_t cell_len = cur - start_cell;
+            size_t cell_len = (size_t)(cur - start_cell);
             char* cell = make_str_from(start_cell, cell_len);
 
-            if ((ret = on_cell(cell, cell_len, cell_no, data)) != 0) return ret;
+            // OPTIMIZE ?
+            if (line_no == 0 && on_header != NULL)
+                ret = on_header(cell, cell_len, cell_no, line_no, data);
+            else
+                ret = on_cell(cell, cell_len, cell_no, line_no, data);
+
+            if (ret != 0) return ret;
             free(cell);
 
             start_cell = cur + 1;
@@ -109,12 +148,17 @@ static int parse(const char file_name[], char sep,
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
+    if (argc != 4) {
         printf("Usage: %s file separator\n", argv[0]);
         return 1;
     }
 
     const char* file = argv[1];
     const char* sep = argv[2];
-    return parse(file, sep[0], on_line, on_cell, NULL);
+    bool with_header = strlen(argv[3]) != 0;
+    printf("With header: %d\n", with_header);
+
+    struct headers headers;
+    return parse(file, sep[0], with_header ? on_header : NULL, on_line, on_cell,
+                 &headers);
 }
