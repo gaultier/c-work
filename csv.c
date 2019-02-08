@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -10,6 +9,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#define ASSERT(a, cmp, b, fmt)          \
+    do {                                \
+        if (!((a)cmp(b))) {             \
+            fprintf(stderr, fmt, a, b); \
+            exit(1);                    \
+        }                               \
+    } while (0);
 struct headers {
     size_t size;
     char** headers;
@@ -52,12 +58,12 @@ static int on_header(const char* header, size_t header_len, size_t header_no,
     (void)header_len;
     (void)data;
     printf("Header: %zu: `%s`\n", header_no, header);
+    ASSERT(data, !=, NULL, "%p == NULL");
 
-    assert(data);
     struct headers* h = (struct headers*)(data);
     h->size += 1;
     h->headers = realloc(h->headers, sizeof(char*) * h->size);
-    assert(header_no == (h->size - 1));
+    ASSERT(header_no, ==, h->size - 1, "%zu != %zu\n");
     h->headers[header_no] = strdup(header);
     return 0;
 }
@@ -76,12 +82,42 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
     (void)data;
     if (data) {
         struct headers* h = (struct headers*)(data);
-        assert(cell_no < h->size);
+        ASSERT(cell_no, <, h->size - 1, "%zu != %zu\n");
         printf("%zu:%zu: `%s`: `%s`\n", line_no, cell_no, h->headers[cell_no],
                cell);
     } else
         printf("%zu:%zu: `%s`\n", line_no, cell_no, cell);
 
+    return 0;
+}
+
+static int parse_headers(const char* end, const char** cur, char sep,
+                         int (*on_header)(const char* header, size_t header_len,
+                                          size_t header_no, void* data),
+                         void* data) {
+    size_t cell_no = 0;
+    bool inside_quotes = false;
+    const char* start_cell = *cur;
+    int ret = 0;
+
+    while (*cur < end) {
+        if (**cur == '"') {
+            if ((*cur < end - 1) && (*cur)[1] != '"')
+                inside_quotes = !inside_quotes;
+        } else if ((**cur == '\n' && !inside_quotes) ||
+                   (**cur == sep && !inside_quotes)) {
+            size_t cell_len = (size_t)(*cur - start_cell);
+            char* cell = make_str_from(start_cell, cell_len);
+
+            if ((ret = on_header(cell, cell_len, cell_no, data)) != 0)
+                return ret;
+            free(cell);
+
+            start_cell = *cur + 1;
+            cell_no++;
+        }
+        (*cur)++;
+    }
     return 0;
 }
 
@@ -106,20 +142,21 @@ static int parse(const char file_name[], char sep,
     const char* start_line = file;
     int ret = 0;
 
+    if (on_header) {
+        if ((ret = parse_headers(file + file_size, &cur, sep, on_header,
+                                 data)) != 0)
+            return ret;
+    }
+
     while (cur < file + file_size) {
         // TODO: handle last line without newline
         if (*cur == '\n' && !inside_quotes) {
             {
                 size_t cell_len = (size_t)(cur - start_cell);
                 char* cell = make_str_from(start_cell, cell_len);
-                // OPTIMIZE ?
-                if (line_no == 0 && on_header != NULL)
-                    ret = on_header(cell, cell_len, cell_no, data);
-                else
-                    ret = on_cell(cell, cell_len, cell_no, line_no, data);
-
-                if (ret != 0) return ret;
-                free(cell);
+                if ((ret = on_cell(cell, cell_len, cell_no, line_no, data)) !=
+                    0)
+                    return ret;
             }
             {
                 size_t line_len = (size_t)(cur - start_line);
@@ -141,13 +178,9 @@ static int parse(const char file_name[], char sep,
             size_t cell_len = (size_t)(cur - start_cell);
             char* cell = make_str_from(start_cell, cell_len);
 
-            // OPTIMIZE ?
-            if (line_no == 0 && on_header != NULL)
-                ret = on_header(cell, cell_len, cell_no, data);
-            else
-                ret = on_cell(cell, cell_len, cell_no, line_no, data);
+            if ((ret = on_cell(cell, cell_len, cell_no, line_no, data)) != 0)
+                return ret;
 
-            if (ret != 0) return ret;
             free(cell);
 
             start_cell = cur + 1;
