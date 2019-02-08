@@ -78,7 +78,7 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
                    size_t line_no, void* data) {
     (void)cell_len;
     (void)data;
-    if (strcmp(cell, "NaN") == 0) return 0;  // BTC
+    if (memcmp(cell, "NaN", cell_len < 3 ? cell_len : 3) == 0) return 0;  // BTC
     if (data) {
         struct headers* h = (struct headers*)(data);
         ASSERT(cell_no, <, h->size, "%zu >= %zu\n");
