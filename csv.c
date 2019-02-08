@@ -42,6 +42,7 @@ static char* make_str_from(const char* src, size_t len) {
     char* s = malloc(len + 1);
     memcpy(s, src, len + 1);
     s[len] = '\0';
+    // Remove trailing carriage return (assuming \r\n end of lines)
     if (len >= 1 && s[len - 1] == '\r') s[len - 1] = '\0';
     return s;
 }
@@ -52,6 +53,7 @@ static int on_header(const char* header, size_t header_len, size_t header_no,
     (void)data;
     printf("Header: %zu: `%s`\n", header_no, header);
 
+    assert(data);
     struct headers* h = (struct headers*)(data);
     h->size += 1;
     h->headers = realloc(h->headers, sizeof(char*) * h->size);
@@ -72,10 +74,14 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
                    size_t line_no, void* data) {
     (void)cell_len;
     (void)data;
-    struct headers* h = (struct headers*)(data);
-    assert(cell_no < h->size);
-    printf("%zu:%zu: `%s`: `%s`\n", line_no, cell_no, h->headers[cell_no],
-           cell);
+    if (data) {
+        struct headers* h = (struct headers*)(data);
+        assert(cell_no < h->size);
+        printf("%zu:%zu: `%s`: `%s`\n", line_no, cell_no, h->headers[cell_no],
+               cell);
+    } else
+        printf("%zu:%zu: `%s`\n", line_no, cell_no, cell);
+
     return 0;
 }
 
@@ -102,7 +108,6 @@ static int parse(const char file_name[], char sep,
 
     while (cur < file + file_size) {
         // TODO: handle last line without newline
-        // TODO handle "\r\n"
         if (*cur == '\n' && !inside_quotes) {
             {
                 size_t cell_len = (size_t)(cur - start_cell);
@@ -155,7 +160,7 @@ static int parse(const char file_name[], char sep,
 
 int main(int argc, char* argv[]) {
     if (argc != 4) {
-        printf("Usage: %s file separator\n", argv[0]);
+        printf("Usage: %s file separator with_header\n", argv[0]);
         return 1;
     }
 
@@ -165,5 +170,5 @@ int main(int argc, char* argv[]) {
 
     struct headers headers = {0};
     return parse(file, sep[0], with_header ? on_header : NULL, on_line, on_cell,
-                 &headers);
+                 with_header ? &headers : NULL);
 }
