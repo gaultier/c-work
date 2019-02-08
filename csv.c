@@ -9,12 +9,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define ASSERT(a, cmp, b, fmt)          \
-    do {                                \
-        if (!((a)cmp(b))) {             \
-            fprintf(stderr, fmt, a, b); \
-            exit(1);                    \
-        }                               \
+#define ASSERT(a, cmp, b, fmt)                                         \
+    do {                                                               \
+        if (!((a)cmp(b))) {                                            \
+            fprintf(stderr, "[%s:%d] " fmt, __FILE__, __LINE__, a, b); \
+            exit(1);                                                   \
+        }                                                              \
     } while (0);
 struct headers {
     size_t size;
@@ -82,7 +82,7 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
     (void)data;
     if (data) {
         struct headers* h = (struct headers*)(data);
-        ASSERT(cell_no, <, h->size - 1, "%zu != %zu\n");
+        ASSERT(cell_no, <, h->size, "%zu >= %zu\n");
         printf("%zu:%zu: `%s`: `%s`\n", line_no, cell_no, h->headers[cell_no],
                cell);
     } else
@@ -115,6 +115,10 @@ static int parse_headers(const char* end, const char** cur, char sep,
 
             start_cell = *cur + 1;
             cell_no++;
+            if (**cur == '\n') {
+                (*cur)++;
+                break;
+            }
         }
         (*cur)++;
     }
@@ -138,8 +142,6 @@ static int parse(const char file_name[], char sep,
     size_t line_no = 0;
     size_t cell_no = 0;
     bool inside_quotes = false;
-    const char* start_cell = file;
-    const char* start_line = file;
     int ret = 0;
 
     if (on_header) {
@@ -147,6 +149,8 @@ static int parse(const char file_name[], char sep,
                                  data)) != 0)
             return ret;
     }
+    const char* start_cell = cur;
+    const char* start_line = cur;
 
     while (cur < file + file_size) {
         // TODO: handle last line without newline
