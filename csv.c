@@ -17,9 +17,15 @@
             exit(1);                                                   \
         }                                                              \
     } while (0);
+
+struct header {
+    const char* str;
+    size_t len;
+};
+
 struct headers {
     size_t size;
-    char** headers;
+    struct header* headers;
 };
 
 static int read_file(const char file_name[], char** str, uint64_t* size) {
@@ -43,29 +49,20 @@ static int read_file(const char file_name[], char** str, uint64_t* size) {
     return 0;
 }
 
-static char* make_str_from(const char* src, size_t len) {
-    // TODO: maybe in case of empty str (len == 0), re-use the same static
-    // string and bypass malloc?
-    char* s = malloc(len + 1);
-    memcpy(s, src, len + 1);
-    s[len] = '\0';
-    // Remove trailing carriage return (assuming \r\n end of lines)
-    if (len >= 1 && s[len - 1] == '\r') s[len - 1] = '\0';
-    return s;
-}
-
 static int on_header(const char* header, size_t header_len, size_t header_no,
                      void* data) {
     (void)header_len;
     (void)data;
-    printf("Header: %zu: `%s`\n", header_no, header);
+    printf("Header: %zu: `%.*s`\n", header_no, (int)header_len, header);
     ASSERT(data, !=, NULL, "%p == NULL");
 
-    struct headers* h = (struct headers*)(data);
-    h->size += 1;
-    h->headers = realloc(h->headers, sizeof(char*) * h->size);
-    ASSERT(header_no, ==, h->size - 1, "%zu != %zu\n");
-    h->headers[header_no] = strdup(header);
+    struct headers* headers = (struct headers*)(data);
+    headers->size += 1;
+    headers->headers =
+        realloc(headers->headers, sizeof(struct header) * headers->size);
+    ASSERT(header_no, ==, headers->size - 1, "%zu != %zu\n");
+    headers->headers[header_no] =
+        (struct header){.len = header_len, .str = header};
     return 0;
 }
 
@@ -73,7 +70,7 @@ static int on_line(const char* line, size_t line_len, size_t line_no,
                    void* data) {
     (void)line_len;
     (void)data;
-    printf("%zu: `%s`\n", line_no, line);
+    printf("%zu: `%.*s`\n", line_no, (int)line_len, line);
     return 0;
 }
 
@@ -85,10 +82,11 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
     if (data) {
         struct headers* h = (struct headers*)(data);
         ASSERT(cell_no, <, h->size, "%zu >= %zu\n");
-        printf("%zu:%zu: `%s`: `%s`\n", line_no, cell_no, h->headers[cell_no],
-               cell);
+        printf("%zu:%zu: `%.*s`: `%.*s`\n", line_no, cell_no,
+               (int)h->headers[cell_no].len, h->headers[cell_no].str,
+               (int)cell_len, cell);
     } else
-        printf("%zu:%zu: `%s`\n", line_no, cell_no, cell);
+        printf("%zu:%zu: `%.*s`\n", line_no, cell_no, (int)cell_len, cell);
 
     return 0;
 }
@@ -111,11 +109,9 @@ static int parse_headers(const char* end, const char** cur, char sep,
         } else if ((**cur == '\n' && !inside_quotes) ||
                    (**cur == sep && !inside_quotes)) {
             size_t cell_len = (size_t)(*cur - start_cell);
-            char* cell = make_str_from(start_cell, cell_len);
 
-            if ((ret = on_header(cell, cell_len, cell_no, data)) != 0)
+            if ((ret = on_header(start_cell, cell_len, cell_no, data)) != 0)
                 return ret;
-            free(cell);
 
             start_cell = *cur + 1;
             cell_no++;
@@ -161,19 +157,15 @@ static int parse(const char file_name[], char sep,
         if (*cur == '\n' && !inside_quotes) {
             if (on_cell) {
                 size_t cell_len = (size_t)(cur - start_cell);
-                char* cell = make_str_from(start_cell, cell_len);
-                if ((ret = on_cell(cell, cell_len, cell_no, line_no, data)) !=
-                    0)
+                if ((ret = on_cell(start_cell, cell_len, cell_no, line_no,
+                                   data)) != 0)
                     return ret;
             }
             if (on_line) {
                 size_t line_len = (size_t)(cur - start_line);
-                char* line = make_str_from(start_line, line_len);
 
-                if ((ret = on_line(line, line_len, line_no, data)) != 0)
+                if ((ret = on_line(start_line, line_len, line_no, data)) != 0)
                     return ret;
-
-                free(line);
             }
             start_line = cur + 1;
             start_cell = cur + 1;
@@ -185,13 +177,10 @@ static int parse(const char file_name[], char sep,
         } else if (*cur == sep && !inside_quotes) {
             if (on_cell) {
                 size_t cell_len = (size_t)(cur - start_cell);
-                char* cell = make_str_from(start_cell, cell_len);
 
-                if ((ret = on_cell(cell, cell_len, cell_no, line_no, data)) !=
-                    0)
+                if ((ret = on_cell(start_cell, cell_len, cell_no, line_no,
+                                   data)) != 0)
                     return ret;
-
-                free(cell);
             }
 
             start_cell = cur + 1;
