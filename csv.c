@@ -28,27 +28,6 @@ struct headers {
     struct header* headers;
 };
 
-static int read_file(const char file_name[], char** str, uint64_t* size) {
-    const int fd = open(file_name, O_RDONLY);
-    if (fd == -1) return errno;
-
-    struct stat s;
-    const int res = fstat(fd, &s);
-    if (res == -1) {
-        close(fd);
-        return errno;
-    }
-
-    *size = (uint64_t)s.st_size;
-    *str = mmap(NULL, *size, PROT_READ, MAP_FILE | MAP_PRIVATE, fd, 0);
-    if (*str == MAP_FAILED) {
-        close(fd);
-        return errno;
-    }
-
-    return 0;
-}
-
 static int on_header(const char* header, size_t header_len, size_t header_no,
                      void* data) {
     (void)header_len;
@@ -86,6 +65,28 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
                (int)cell_len, cell);
     } else
         printf("%zu:%zu: `%.*s`\n", line_no, cell_no, (int)cell_len, cell);
+    return 0;
+}
+
+// --- LIB ---
+static int read_file(const char file_name[], char** str, uint64_t* size) {
+    const int fd = open(file_name, O_RDONLY);
+    if (fd == -1) return errno;
+
+    struct stat s;
+    const int res = fstat(fd, &s);
+    if (res == -1) {
+        close(fd);
+        return errno;
+    }
+
+    *size = (uint64_t)s.st_size;
+    *str = mmap(NULL, *size, PROT_READ, MAP_FILE | MAP_PRIVATE, fd, 0);
+    if (*str == MAP_FAILED) {
+        close(fd);
+        return errno;
+    }
+
     return 0;
 }
 
@@ -152,6 +153,7 @@ static int parse(const char file_name[], char sep,
 
     while (cur < file + file_size) {
         // TODO: handle last line without newline
+        // TODO: handle \r\n newlines
         if (*cur == '\n' && !inside_quotes) {
             if (on_cell) {
                 size_t cell_len = (size_t)(cur - start_cell);
