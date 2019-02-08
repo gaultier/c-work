@@ -78,7 +78,6 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
                    size_t line_no, void* data) {
     (void)cell_len;
     (void)data;
-    if (memcmp(cell, "NaN", cell_len < 3 ? cell_len : 3) == 0) return 0;  // BTC
     if (data) {
         struct headers* h = (struct headers*)(data);
         ASSERT(cell_no, <, h->size, "%zu >= %zu\n");
@@ -87,7 +86,6 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
                (int)cell_len, cell);
     } else
         printf("%zu:%zu: `%.*s`\n", line_no, cell_no, (int)cell_len, cell);
-
     return 0;
 }
 
@@ -202,6 +200,6 @@ int main(int argc, char* argv[]) {
     bool with_header = strlen(argv[3]) != 0;
 
     struct headers headers = {0};
-    return parse(file, sep[0], with_header ? on_header : NULL,
-                 NULL /*on_line BTC*/, on_cell, with_header ? &headers : NULL);
+    return parse(file, sep[0], with_header ? on_header : NULL, on_line, on_cell,
+                 with_header ? &headers : NULL);
 }
