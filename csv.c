@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -80,6 +81,7 @@ static int on_cell(const char* cell, size_t cell_len, size_t cell_no,
                    size_t line_no, void* data) {
     (void)cell_len;
     (void)data;
+    if (strcmp(cell, "NaN") == 0) return 0;  // BTC
     if (data) {
         struct headers* h = (struct headers*)(data);
         ASSERT(cell_no, <, h->size, "%zu >= %zu\n");
@@ -95,6 +97,8 @@ static int parse_headers(const char* end, const char** cur, char sep,
                          int (*on_header)(const char* header, size_t header_len,
                                           size_t header_no, void* data),
                          void* data) {
+    assert(on_header);
+
     size_t cell_no = 0;
     bool inside_quotes = false;
     const char* start_cell = *cur;
@@ -155,14 +159,14 @@ static int parse(const char file_name[], char sep,
     while (cur < file + file_size) {
         // TODO: handle last line without newline
         if (*cur == '\n' && !inside_quotes) {
-            {
+            if (on_cell) {
                 size_t cell_len = (size_t)(cur - start_cell);
                 char* cell = make_str_from(start_cell, cell_len);
                 if ((ret = on_cell(cell, cell_len, cell_no, line_no, data)) !=
                     0)
                     return ret;
             }
-            {
+            if (on_line) {
                 size_t line_len = (size_t)(cur - start_line);
                 char* line = make_str_from(start_line, line_len);
 
@@ -179,13 +183,16 @@ static int parse(const char file_name[], char sep,
             if ((cur < file + file_size - 1) && *(cur + 1) != '"')
                 inside_quotes = !inside_quotes;
         } else if (*cur == sep && !inside_quotes) {
-            size_t cell_len = (size_t)(cur - start_cell);
-            char* cell = make_str_from(start_cell, cell_len);
+            if (on_cell) {
+                size_t cell_len = (size_t)(cur - start_cell);
+                char* cell = make_str_from(start_cell, cell_len);
 
-            if ((ret = on_cell(cell, cell_len, cell_no, line_no, data)) != 0)
-                return ret;
+                if ((ret = on_cell(cell, cell_len, cell_no, line_no, data)) !=
+                    0)
+                    return ret;
 
-            free(cell);
+                free(cell);
+            }
 
             start_cell = cur + 1;
             cell_no++;
@@ -206,6 +213,6 @@ int main(int argc, char* argv[]) {
     bool with_header = strlen(argv[3]) != 0;
 
     struct headers headers = {0};
-    return parse(file, sep[0], with_header ? on_header : NULL, on_line, on_cell,
-                 with_header ? &headers : NULL);
+    return parse(file, sep[0], with_header ? on_header : NULL,
+                 NULL /*on_line BTC*/, on_cell, with_header ? &headers : NULL);
 }
