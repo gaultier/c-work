@@ -24,10 +24,16 @@ struct in_data {
     MYSQL *mysql;
 };
 
-static sds csv_rows(void *clientdata) {
+static void writeToClient(aeEventLoop *loop, int fd, void *clientdata,
+                          int mask) {
+    const char res[] =
+        "HTTP/1.1 200 OK\r\nContent-Type: "
+        "text/csv\r\nContent-Disposition: attachment; "
+        "filename=\"test.csv\"\r\nConnection: close\r\n\r\n";
+    write(fd, res, sizeof(res));
+
     struct in_data *d = clientdata;
-    const char query[] =
-        "select external_reference from tab_merchant order by id desc limit 5";
+    const char query[] = "select external_reference from tab_merchant";
     MYSQL_STMT *stmt = mysql_stmt_init(d->mysql);
     CHECK((mysql_stmt_prepare(stmt, query, strlen(query)) == 0),
           mysql_stmt_error(stmt));
@@ -42,12 +48,11 @@ static sds csv_rows(void *clientdata) {
     CHECK((mysql_stmt_execute(stmt) == 0), mysql_stmt_error(stmt));
     CHECK((mysql_stmt_store_result(stmt) == 0), mysql_stmt_error(stmt));
 
-    sds csv = sdsempty();
     int fetch_result = 0;
     while ((fetch_result = mysql_stmt_fetch(stmt)) == 0) {
         const char *s = bind_out[0].buffer;
-        csv = sdscat(csv, s);
-        csv = sdscat(csv, "\n");
+        write(fd, s, strlen(s));
+        write(fd, "\n", 1);
     }
     if (fetch_result != MYSQL_NO_DATA) {
         fprintf(stderr, "Error fetching rows: %d %d %s\n", fetch_result,
@@ -55,21 +60,6 @@ static sds csv_rows(void *clientdata) {
         exit(1);
     }
 
-    return csv;
-}
-
-static void writeToClient(aeEventLoop *loop, int fd, void *clientdata,
-                          int mask) {
-    sds rows = csv_rows(clientdata);
-    sds response = sdscatfmt(
-        sdsempty(),
-        "HTTP/1.1 200 OK\r\nContent-Type: "
-        "text/csv\r\nContent-Length: %u\r\nContent-Disposition: attachment; "
-        "filename=\"test.csv\"\r\nConnection: close\r\n\r\n%s",
-        sdslen(rows), rows);
-    write(fd, response, sdslen(response));
-    sdsfree(response);
-    sdsfree(rows);
     aeDeleteFileEvent(loop, fd, mask);
     close(fd);
 }
