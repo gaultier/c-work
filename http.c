@@ -1,23 +1,33 @@
 #include <assert.h>
+#include <sds.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
+#include <sds.c>
 
 #include "ae.h"
 #include "anet.h"
 
 static void writeToClient(aeEventLoop *loop, int fd, void *clientdata,
                           int mask) {
-    char body[] = "<html><bold>hello</bold></html>";
-    char *buffer = calloc(1, 1000);
-    snprintf(buffer, 1000,
-             "HTTP/1.1 200 OK\r\nContent-Type: "
-             "text/html\r\nContent-Length: %zu\r\nConnection: close\r\n\r\n%s",
-             strlen(body), body);
-    write(fd, buffer, strlen(buffer));
-    free(buffer);
+    time_t now_t = time(NULL);
+    struct tm *now_tm = gmtime(&now_t);
+    char now_s[25] = "\0";
+    strftime(now_s, sizeof(now_s), "%F %T", now_tm);
+    sds body = sdscatfmt(sdsempty(), "<html><bold>hello</bold><p>%s</p></html>",
+                         now_s);
+    sds response = sdscatfmt(
+        sdsempty(),
+        "HTTP/1.1 200 OK\r\nContent-Type: "
+        "text/html\r\nContent-Length: %u\r\nConnection: close\r\n\r\n%s",
+        sdslen(body), body);
+    write(fd, response, sdslen(response));
+    sdsfree(response);
+    sdsfree(body);
     aeDeleteFileEvent(loop, fd, mask);
+    close(fd);
 }
 
 static void readFromClient(aeEventLoop *loop, int fd, void *clientdata,
