@@ -24,22 +24,24 @@ struct in_data {
     MYSQL *mysql;
 };
 
-static int db_merchants_select(MYSQL *mysql, sds *result) {
-    const char query[] =
-        "select external_reference, girogate_merchant_contract_name from "
-        "tab_merchant limit 5";
-    MYSQL_STMT *stmt = mysql_stmt_init(mysql);
+static void writeToClient(aeEventLoop *loop, int fd, void *clientdata,
+                          int mask) {
+    const char res[] =
+        "HTTP/1.1 200 OK\r\nContent-Type: "
+        "text/csv\r\nContent-Disposition: attachment; "
+        "filename=\"test.csv\"\r\nConnection: close\r\n\r\n";
+    write(fd, res, sizeof(res));
+
+    struct in_data *d = clientdata;
+    const char query[] = "select external_reference from tab_merchant";
+    MYSQL_STMT *stmt = mysql_stmt_init(d->mysql);
     CHECK((mysql_stmt_prepare(stmt, query, strlen(query)) == 0),
           mysql_stmt_error(stmt));
 
     char external_reference[256] = "\0";
-    char girogate_merchant_contract_name[256] = "\0";
     const size_t buffer_length = 256;
     MYSQL_BIND bind_out[] = {{.buffer_type = MYSQL_TYPE_STRING,
                               .buffer = external_reference,
-                              .buffer_length = buffer_length},
-                             {.buffer_type = MYSQL_TYPE_STRING,
-                              .buffer = girogate_merchant_contract_name,
                               .buffer_length = buffer_length}};
     CHECK((mysql_stmt_bind_result(stmt, bind_out) == 0),
           mysql_stmt_error(stmt));
@@ -48,36 +50,18 @@ static int db_merchants_select(MYSQL *mysql, sds *result) {
 
     int fetch_result = 0;
     while ((fetch_result = mysql_stmt_fetch(stmt)) == 0) {
-        const char *external_reference = bind_out[0].buffer;
-        const char *girogate_merchant_contract_name = bind_out[1].buffer;
-        *result = sdscatfmt(*result, "<p>%s: %s</p>", external_reference,
-                            girogate_merchant_contract_name);
+        const char *s = bind_out[0].buffer;
+        write(fd, s, strlen(s));
+        write(fd, "\n", 1);
     }
     if (fetch_result != MYSQL_NO_DATA) {
         fprintf(stderr, "Error fetching rows: %d %d %s\n", fetch_result,
                 mysql_stmt_errno(stmt), mysql_stmt_error(stmt));
         exit(1);
     }
-    return 0;
-}
-
-static void writeToClient(aeEventLoop *loop, int fd, void *clientdata,
-                          int mask) {
-    struct in_data *d = clientdata;
-
-    sds body = sdsempty();
-    db_merchants_select(d->mysql, &body);
-    sds payload = sdscatfmt(
-        sdsempty(),
-        "HTTP/1.1 200 OK\r\nContent-Type: "
-        "text/html\r\nContent-Type: %U\r\nConnection: close\r\n\r\n%s",
-        sdslen(body), body);
-    write(fd, payload, sdslen(payload));
 
     aeDeleteFileEvent(loop, fd, mask);
     close(fd);
-    sdsfree(body);
-    sdsfree(payload);
 }
 
 static void readFromClient(aeEventLoop *loop, int fd, void *clientdata,
