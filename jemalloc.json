@@ -1,0 +1,2258 @@
+{
+	"jemalloc": {
+		"version": "5.1.0-0-g61efbda7098de6fe64c362d309824864308c36d4",
+		"config": {
+			"cache_oblivious": true,
+			"debug": false,
+			"fill": true,
+			"lazy_lock": false,
+			"malloc_conf": "",
+			"prof": false,
+			"prof_libgcc": false,
+			"prof_libunwind": false,
+			"stats": true,
+			"utrace": false,
+			"xmalloc": false
+		},
+		"opt": {
+			"abort": false,
+			"abort_conf": false,
+			"retain": false,
+			"dss": "secondary",
+			"narenas": 16,
+			"percpu_arena": "disabled",
+			"metadata_thp": "disabled",
+			"dirty_decay_ms": 10000,
+			"muzzy_decay_ms": 10000,
+			"junk": "false",
+			"zero": false,
+			"tcache": true,
+			"lg_tcache_max": 15,
+			"thp": "not supported",
+			"stats_print": false,
+			"stats_print_opts": ""
+		},
+		"arenas": {
+			"narenas": 16,
+			"dirty_decay_ms": 10000,
+			"muzzy_decay_ms": 10000,
+			"quantum": 16,
+			"page": 4096,
+			"tcache_max": 32768,
+			"nbins": 36,
+			"nhbins": 41,
+			"bin": [
+				{
+					"size": 8,
+					"nregs": 512,
+					"slab_size": 4096
+				},
+				{
+					"size": 16,
+					"nregs": 256,
+					"slab_size": 4096
+				},
+				{
+					"size": 32,
+					"nregs": 128,
+					"slab_size": 4096
+				},
+				{
+					"size": 48,
+					"nregs": 256,
+					"slab_size": 12288
+				},
+				{
+					"size": 64,
+					"nregs": 64,
+					"slab_size": 4096
+				},
+				{
+					"size": 80,
+					"nregs": 256,
+					"slab_size": 20480
+				},
+				{
+					"size": 96,
+					"nregs": 128,
+					"slab_size": 12288
+				},
+				{
+					"size": 112,
+					"nregs": 256,
+					"slab_size": 28672
+				},
+				{
+					"size": 128,
+					"nregs": 32,
+					"slab_size": 4096
+				},
+				{
+					"size": 160,
+					"nregs": 128,
+					"slab_size": 20480
+				},
+				{
+					"size": 192,
+					"nregs": 64,
+					"slab_size": 12288
+				},
+				{
+					"size": 224,
+					"nregs": 128,
+					"slab_size": 28672
+				},
+				{
+					"size": 256,
+					"nregs": 16,
+					"slab_size": 4096
+				},
+				{
+					"size": 320,
+					"nregs": 64,
+					"slab_size": 20480
+				},
+				{
+					"size": 384,
+					"nregs": 32,
+					"slab_size": 12288
+				},
+				{
+					"size": 448,
+					"nregs": 64,
+					"slab_size": 28672
+				},
+				{
+					"size": 512,
+					"nregs": 8,
+					"slab_size": 4096
+				},
+				{
+					"size": 640,
+					"nregs": 32,
+					"slab_size": 20480
+				},
+				{
+					"size": 768,
+					"nregs": 16,
+					"slab_size": 12288
+				},
+				{
+					"size": 896,
+					"nregs": 32,
+					"slab_size": 28672
+				},
+				{
+					"size": 1024,
+					"nregs": 4,
+					"slab_size": 4096
+				},
+				{
+					"size": 1280,
+					"nregs": 16,
+					"slab_size": 20480
+				},
+				{
+					"size": 1536,
+					"nregs": 8,
+					"slab_size": 12288
+				},
+				{
+					"size": 1792,
+					"nregs": 16,
+					"slab_size": 28672
+				},
+				{
+					"size": 2048,
+					"nregs": 2,
+					"slab_size": 4096
+				},
+				{
+					"size": 2560,
+					"nregs": 8,
+					"slab_size": 20480
+				},
+				{
+					"size": 3072,
+					"nregs": 4,
+					"slab_size": 12288
+				},
+				{
+					"size": 3584,
+					"nregs": 8,
+					"slab_size": 28672
+				},
+				{
+					"size": 4096,
+					"nregs": 1,
+					"slab_size": 4096
+				},
+				{
+					"size": 5120,
+					"nregs": 4,
+					"slab_size": 20480
+				},
+				{
+					"size": 6144,
+					"nregs": 2,
+					"slab_size": 12288
+				},
+				{
+					"size": 7168,
+					"nregs": 4,
+					"slab_size": 28672
+				},
+				{
+					"size": 8192,
+					"nregs": 1,
+					"slab_size": 8192
+				},
+				{
+					"size": 10240,
+					"nregs": 2,
+					"slab_size": 20480
+				},
+				{
+					"size": 12288,
+					"nregs": 1,
+					"slab_size": 12288
+				},
+				{
+					"size": 14336,
+					"nregs": 2,
+					"slab_size": 28672
+				}
+			],
+			"nlextents": 196,
+			"lextent": [
+				{
+					"size": 16384
+				},
+				{
+					"size": 20480
+				},
+				{
+					"size": 24576
+				},
+				{
+					"size": 28672
+				},
+				{
+					"size": 32768
+				},
+				{
+					"size": 40960
+				},
+				{
+					"size": 49152
+				},
+				{
+					"size": 57344
+				},
+				{
+					"size": 65536
+				},
+				{
+					"size": 81920
+				},
+				{
+					"size": 98304
+				},
+				{
+					"size": 114688
+				},
+				{
+					"size": 131072
+				},
+				{
+					"size": 163840
+				},
+				{
+					"size": 196608
+				},
+				{
+					"size": 229376
+				},
+				{
+					"size": 262144
+				},
+				{
+					"size": 327680
+				},
+				{
+					"size": 393216
+				},
+				{
+					"size": 458752
+				},
+				{
+					"size": 524288
+				},
+				{
+					"size": 655360
+				},
+				{
+					"size": 786432
+				},
+				{
+					"size": 917504
+				},
+				{
+					"size": 1048576
+				},
+				{
+					"size": 1310720
+				},
+				{
+					"size": 1572864
+				},
+				{
+					"size": 1835008
+				},
+				{
+					"size": 2097152
+				},
+				{
+					"size": 2621440
+				},
+				{
+					"size": 3145728
+				},
+				{
+					"size": 3670016
+				},
+				{
+					"size": 4194304
+				},
+				{
+					"size": 5242880
+				},
+				{
+					"size": 6291456
+				},
+				{
+					"size": 7340032
+				},
+				{
+					"size": 8388608
+				},
+				{
+					"size": 10485760
+				},
+				{
+					"size": 12582912
+				},
+				{
+					"size": 14680064
+				},
+				{
+					"size": 16777216
+				},
+				{
+					"size": 20971520
+				},
+				{
+					"size": 25165824
+				},
+				{
+					"size": 29360128
+				},
+				{
+					"size": 33554432
+				},
+				{
+					"size": 41943040
+				},
+				{
+					"size": 50331648
+				},
+				{
+					"size": 58720256
+				},
+				{
+					"size": 67108864
+				},
+				{
+					"size": 83886080
+				},
+				{
+					"size": 100663296
+				},
+				{
+					"size": 117440512
+				},
+				{
+					"size": 134217728
+				},
+				{
+					"size": 167772160
+				},
+				{
+					"size": 201326592
+				},
+				{
+					"size": 234881024
+				},
+				{
+					"size": 268435456
+				},
+				{
+					"size": 335544320
+				},
+				{
+					"size": 402653184
+				},
+				{
+					"size": 469762048
+				},
+				{
+					"size": 536870912
+				},
+				{
+					"size": 671088640
+				},
+				{
+					"size": 805306368
+				},
+				{
+					"size": 939524096
+				},
+				{
+					"size": 1073741824
+				},
+				{
+					"size": 1342177280
+				},
+				{
+					"size": 1610612736
+				},
+				{
+					"size": 1879048192
+				},
+				{
+					"size": 2147483648
+				},
+				{
+					"size": 2684354560
+				},
+				{
+					"size": 3221225472
+				},
+				{
+					"size": 3758096384
+				},
+				{
+					"size": 4294967296
+				},
+				{
+					"size": 5368709120
+				},
+				{
+					"size": 6442450944
+				},
+				{
+					"size": 7516192768
+				},
+				{
+					"size": 8589934592
+				},
+				{
+					"size": 10737418240
+				},
+				{
+					"size": 12884901888
+				},
+				{
+					"size": 15032385536
+				},
+				{
+					"size": 17179869184
+				},
+				{
+					"size": 21474836480
+				},
+				{
+					"size": 25769803776
+				},
+				{
+					"size": 30064771072
+				},
+				{
+					"size": 34359738368
+				},
+				{
+					"size": 42949672960
+				},
+				{
+					"size": 51539607552
+				},
+				{
+					"size": 60129542144
+				},
+				{
+					"size": 68719476736
+				},
+				{
+					"size": 85899345920
+				},
+				{
+					"size": 103079215104
+				},
+				{
+					"size": 120259084288
+				},
+				{
+					"size": 137438953472
+				},
+				{
+					"size": 171798691840
+				},
+				{
+					"size": 206158430208
+				},
+				{
+					"size": 240518168576
+				},
+				{
+					"size": 274877906944
+				},
+				{
+					"size": 343597383680
+				},
+				{
+					"size": 412316860416
+				},
+				{
+					"size": 481036337152
+				},
+				{
+					"size": 549755813888
+				},
+				{
+					"size": 687194767360
+				},
+				{
+					"size": 824633720832
+				},
+				{
+					"size": 962072674304
+				},
+				{
+					"size": 1099511627776
+				},
+				{
+					"size": 1374389534720
+				},
+				{
+					"size": 1649267441664
+				},
+				{
+					"size": 1924145348608
+				},
+				{
+					"size": 2199023255552
+				},
+				{
+					"size": 2748779069440
+				},
+				{
+					"size": 3298534883328
+				},
+				{
+					"size": 3848290697216
+				},
+				{
+					"size": 4398046511104
+				},
+				{
+					"size": 5497558138880
+				},
+				{
+					"size": 6597069766656
+				},
+				{
+					"size": 7696581394432
+				},
+				{
+					"size": 8796093022208
+				},
+				{
+					"size": 10995116277760
+				},
+				{
+					"size": 13194139533312
+				},
+				{
+					"size": 15393162788864
+				},
+				{
+					"size": 17592186044416
+				},
+				{
+					"size": 21990232555520
+				},
+				{
+					"size": 26388279066624
+				},
+				{
+					"size": 30786325577728
+				},
+				{
+					"size": 35184372088832
+				},
+				{
+					"size": 43980465111040
+				},
+				{
+					"size": 52776558133248
+				},
+				{
+					"size": 61572651155456
+				},
+				{
+					"size": 70368744177664
+				},
+				{
+					"size": 87960930222080
+				},
+				{
+					"size": 105553116266496
+				},
+				{
+					"size": 123145302310912
+				},
+				{
+					"size": 140737488355328
+				},
+				{
+					"size": 175921860444160
+				},
+				{
+					"size": 211106232532992
+				},
+				{
+					"size": 246290604621824
+				},
+				{
+					"size": 281474976710656
+				},
+				{
+					"size": 351843720888320
+				},
+				{
+					"size": 422212465065984
+				},
+				{
+					"size": 492581209243648
+				},
+				{
+					"size": 562949953421312
+				},
+				{
+					"size": 703687441776640
+				},
+				{
+					"size": 844424930131968
+				},
+				{
+					"size": 985162418487296
+				},
+				{
+					"size": 1125899906842624
+				},
+				{
+					"size": 1407374883553280
+				},
+				{
+					"size": 1688849860263936
+				},
+				{
+					"size": 1970324836974592
+				},
+				{
+					"size": 2251799813685248
+				},
+				{
+					"size": 2814749767106560
+				},
+				{
+					"size": 3377699720527872
+				},
+				{
+					"size": 3940649673949184
+				},
+				{
+					"size": 4503599627370496
+				},
+				{
+					"size": 5629499534213120
+				},
+				{
+					"size": 6755399441055744
+				},
+				{
+					"size": 7881299347898368
+				},
+				{
+					"size": 9007199254740992
+				},
+				{
+					"size": 11258999068426240
+				},
+				{
+					"size": 13510798882111488
+				},
+				{
+					"size": 15762598695796736
+				},
+				{
+					"size": 18014398509481984
+				},
+				{
+					"size": 22517998136852480
+				},
+				{
+					"size": 27021597764222976
+				},
+				{
+					"size": 31525197391593472
+				},
+				{
+					"size": 36028797018963968
+				},
+				{
+					"size": 45035996273704960
+				},
+				{
+					"size": 54043195528445952
+				},
+				{
+					"size": 63050394783186944
+				},
+				{
+					"size": 72057594037927936
+				},
+				{
+					"size": 90071992547409920
+				},
+				{
+					"size": 108086391056891904
+				},
+				{
+					"size": 126100789566373888
+				},
+				{
+					"size": 144115188075855872
+				},
+				{
+					"size": 180143985094819840
+				},
+				{
+					"size": 216172782113783808
+				},
+				{
+					"size": 252201579132747776
+				},
+				{
+					"size": 288230376151711744
+				},
+				{
+					"size": 360287970189639680
+				},
+				{
+					"size": 432345564227567616
+				},
+				{
+					"size": 504403158265495552
+				},
+				{
+					"size": 576460752303423488
+				},
+				{
+					"size": 720575940379279360
+				},
+				{
+					"size": 864691128455135232
+				},
+				{
+					"size": 1008806316530991104
+				},
+				{
+					"size": 1152921504606846976
+				},
+				{
+					"size": 1441151880758558720
+				},
+				{
+					"size": 1729382256910270464
+				},
+				{
+					"size": 2017612633061982208
+				},
+				{
+					"size": 2305843009213693952
+				},
+				{
+					"size": 2882303761517117440
+				},
+				{
+					"size": 3458764513820540928
+				},
+				{
+					"size": 4035225266123964416
+				},
+				{
+					"size": 4611686018427387904
+				},
+				{
+					"size": 5764607523034234880
+				},
+				{
+					"size": 6917529027641081856
+				},
+				{
+					"size": 8070450532247928832
+				}
+			]
+		},
+		"stats": {
+			"allocated": 336480,
+			"active": 397312,
+			"metadata": 2528496,
+			"metadata_thp": 0,
+			"resident": 2895872,
+			"mapped": 6688768,
+			"retained": 0,
+			"background_thread": {
+				"num_threads": 0,
+				"num_runs": 0,
+				"run_interval": 0
+			},
+			"mutexes": {
+				"background_thread": {
+					"num_ops": 0,
+					"num_wait": 0,
+					"num_spin_acq": 0,
+					"num_owner_switch": 0,
+					"total_wait_time": 0,
+					"max_wait_time": 0,
+					"max_num_thds": 0
+				},
+				"ctl": {
+					"num_ops": 2,
+					"num_wait": 0,
+					"num_spin_acq": 0,
+					"num_owner_switch": 1,
+					"total_wait_time": 0,
+					"max_wait_time": 0,
+					"max_num_thds": 0
+				},
+				"prof": {
+					"num_ops": 0,
+					"num_wait": 0,
+					"num_spin_acq": 0,
+					"num_owner_switch": 0,
+					"total_wait_time": 0,
+					"max_wait_time": 0,
+					"max_num_thds": 0
+				}
+			}
+		},
+		"stats.arenas": {
+			"0": {
+				"nthreads": 1,
+				"uptime_ns": 3736054,
+				"dss": "disabled",
+				"dirty_decay_ms": 10000,
+				"muzzy_decay_ms": 10000,
+				"pactive": 97,
+				"pdirty": 0,
+				"pmuzzy": 0,
+				"dirty_npurge": 0,
+				"dirty_nmadvise": 0,
+				"dirty_purged": 0,
+				"muzzy_npurge": 0,
+				"muzzy_nmadvise": 0,
+				"muzzy_purged": 0,
+				"small": {
+					"allocated": 209504,
+					"nmalloc": 1365,
+					"ndalloc": 1,
+					"nrequests": 807
+				},
+				"large": {
+					"allocated": 126976,
+					"nmalloc": 5,
+					"ndalloc": 1,
+					"nrequests": 5
+				},
+				"mapped": 6688768,
+				"retained": 0,
+				"base": 2492528,
+				"internal": 35968,
+				"metadata_thp": 0,
+				"tcache_bytes": 178712,
+				"resident": 2895872,
+				"mutexes": {
+					"large": {
+						"num_ops": 2,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 1,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"extent_avail": {
+						"num_ops": 52,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 4,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"extents_dirty": {
+						"num_ops": 56,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 6,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"extents_muzzy": {
+						"num_ops": 50,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 3,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"extents_retained": {
+						"num_ops": 50,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 3,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"decay_dirty": {
+						"num_ops": 2,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 1,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"decay_muzzy": {
+						"num_ops": 2,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 1,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"base": {
+						"num_ops": 76,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 3,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					},
+					"tcache_list": {
+						"num_ops": 5,
+						"num_wait": 0,
+						"num_spin_acq": 0,
+						"num_owner_switch": 2,
+						"total_wait_time": 0,
+						"max_wait_time": 0,
+						"max_num_thds": 0
+					}
+				},
+				"bins": [
+					{
+						"nmalloc": 101,
+						"ndalloc": 1,
+						"curregs": 100,
+						"nrequests": 1,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 1,
+						"mutex": {
+							"num_ops": 10,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 400,
+						"ndalloc": 0,
+						"curregs": 400,
+						"nrequests": 301,
+						"nfills": 4,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 2,
+						"mutex": {
+							"num_ops": 10,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 600,
+						"ndalloc": 0,
+						"curregs": 600,
+						"nrequests": 503,
+						"nfills": 6,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 5,
+						"mutex": {
+							"num_ops": 15,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 100,
+						"ndalloc": 0,
+						"curregs": 100,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 1,
+						"mutex": {
+							"num_ops": 6,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 64,
+						"ndalloc": 0,
+						"curregs": 64,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 1,
+						"mutex": {
+							"num_ops": 6,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 33,
+						"ndalloc": 0,
+						"curregs": 33,
+						"nrequests": 1,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 2,
+						"mutex": {
+							"num_ops": 8,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 3,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 16,
+						"ndalloc": 0,
+						"curregs": 16,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 1,
+						"mutex": {
+							"num_ops": 6,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 10,
+						"ndalloc": 0,
+						"curregs": 10,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 2,
+						"mutex": {
+							"num_ops": 7,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 10,
+						"ndalloc": 0,
+						"curregs": 10,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 3,
+						"mutex": {
+							"num_ops": 8,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 10,
+						"ndalloc": 0,
+						"curregs": 10,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 5,
+						"mutex": {
+							"num_ops": 10,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 10,
+						"ndalloc": 0,
+						"curregs": 10,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 10,
+						"mutex": {
+							"num_ops": 15,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 1,
+						"ndalloc": 0,
+						"curregs": 1,
+						"nrequests": 1,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 1,
+						"mutex": {
+							"num_ops": 6,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 10,
+						"ndalloc": 0,
+						"curregs": 10,
+						"nrequests": 0,
+						"nfills": 1,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 10,
+						"mutex": {
+							"num_ops": 15,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					},
+					{
+						"nmalloc": 0,
+						"ndalloc": 0,
+						"curregs": 0,
+						"nrequests": 0,
+						"nfills": 0,
+						"nflushes": 1,
+						"nreslabs": 0,
+						"curslabs": 0,
+						"mutex": {
+							"num_ops": 4,
+							"num_wait": 0,
+							"num_spin_acq": 0,
+							"num_owner_switch": 2,
+							"total_wait_time": 0,
+							"max_wait_time": 0,
+							"max_num_thds": 0
+						}
+					}
+				],
+				"lextents": [
+					{
+						"curlextents": 2
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 1
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 1
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					},
+					{
+						"curlextents": 0
+					}
+				]
+			}
+		}
+	}
+}

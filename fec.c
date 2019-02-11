@@ -39,7 +39,7 @@ KHASH_MAP_INIT_STR(str, uint64_t)
 int main() {
     char *file = NULL;
     uint64_t file_size = 0;
-    if (readFile("fec.dataset.txt", &file, &file_size) != 0) return errno;
+    if (readFile("fec_short.txt", &file, &file_size) != 0) return errno;
 
     // #1: Total number of lines
     {
@@ -209,6 +209,6 @@ int main() {
                                         (end.tv_usec - start.tv_usec) / 1000);
     }
 #ifdef WITH_JMALLOC
-    malloc_stats_print(NULL, NULL, NULL);
+    malloc_stats_print(NULL, NULL, "J");
 #endif
 }
