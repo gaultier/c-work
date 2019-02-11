@@ -22,16 +22,10 @@
 struct in_data {
     char *buffer;
     MYSQL *mysql;
+    MYSQL_STMT *stmt;
 };
 
-static int db_merchants_select(MYSQL *mysql, sds *result) {
-    const char query[] =
-        "select external_reference, girogate_merchant_contract_name from "
-        "tab_merchant limit 5";
-    MYSQL_STMT *stmt = mysql_stmt_init(mysql);
-    CHECK((mysql_stmt_prepare(stmt, query, strlen(query)) == 0),
-          mysql_stmt_error(stmt));
-
+static int db_merchants_select(MYSQL_STMT *stmt, sds *result) {
     char external_reference[256] = "\0";
     char girogate_merchant_contract_name[256] = "\0";
     const size_t buffer_length = 256;
@@ -66,7 +60,7 @@ static void writeToClient(aeEventLoop *loop, int fd, void *clientdata,
     struct in_data *d = clientdata;
 
     sds body = sdsempty();
-    db_merchants_select(d->mysql, &body);
+    db_merchants_select(d->stmt, &body);
     sds payload = sdscatfmt(
         sdsempty(),
         "HTTP/1.1 200 OK\r\nContent-Type: "
@@ -124,6 +118,12 @@ int main() {
         fprintf(stderr, "Failed to connect to database: Error: %s\n",
                 mysql_error(&mysql));
     }
+    const char query[] =
+        "select external_reference, girogate_merchant_contract_name from "
+        "tab_merchant limit 5";
+    MYSQL_STMT *stmt = mysql_stmt_init(&mysql);
+    CHECK((mysql_stmt_prepare(stmt, query, strlen(query)) == 0),
+          mysql_stmt_error(stmt));
 
     int ipfd;
     // create server socket
@@ -136,7 +136,7 @@ int main() {
 
     // regist socket connect callback
     int ret;
-    struct in_data d = {.mysql = &mysql};
+    struct in_data d = {.mysql = &mysql, .stmt = stmt};
     ret = aeCreateFileEvent(loop, ipfd, AE_READABLE, acceptTcpHandler, &d);
     assert(ret != AE_ERR);
 
