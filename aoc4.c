@@ -26,32 +26,7 @@ static int event_cmp_timestamp(const void* a, const void* b) {
         return 0;
 }
 
-#define ARR_OPTIMUM(arr, len, res, res_i, cmp)                     \
-    do {                                                           \
-        for (size_t i = 0; i < (len); i++)                         \
-            if (((arr)[i])cmp(res)) (res) = (arr)[i], (res_i) = i; \
-    } while (0);
-
 KHASH_MAP_INIT_INT(hash, uint64_t)
-
-struct sleep_stat {
-    uint64_t guard_id, minutes_asleep;
-    time_t fall_asleep_timestamp, wake_up_timestamp;
-    uint8_t fall_asleep_minute, wake_up_minute;
-};
-
-static int sleep_stat_cmp_guard_id(const void* a, const void* b) {
-    const struct sleep_stat* x = a;
-    const struct sleep_stat* y = b;
-    if (x->guard_id < y->guard_id)
-        return -1;
-    else if (x->guard_id > y->guard_id)
-        return 1;
-    else
-        return 0;
-}
-
-KHASH_MAP_INIT_INT(st, struct sleep_stat);
 
 int main() {
     kvec_t(struct event) events;
@@ -109,12 +84,14 @@ int main() {
         }
     }
 
+#ifdef DEBUG
     for (size_t i = 0; i < kv_size(events); i++) {
         struct event* e = &kv_A(events, i);
         printf("- Guard id: %llu\n  Time: %ld %s  Event type: %s\n",
                e->guard_id, e->time, ctime(&e->time),
                event_type_str[e->event_type]);
     }
+#endif
 
     khash_t(hash)* minutes_asleep_per_guard = kh_init(hash);
     {
@@ -125,7 +102,7 @@ int main() {
 
             if (e->event_type == FALL_ASLEEP) fall_asleep_timestamp = e->time;
             if (e->event_type == WAKE_UP) {
-                uint64_t asleep_duration =
+                uint64_t asleep_duration_minute =
                     (uint64_t)lround(difftime(e->time, fall_asleep_timestamp)) /
                     60;
                 fall_asleep_timestamp = 0;
@@ -133,35 +110,38 @@ int main() {
                 int ret;
                 k = kh_put(hash, minutes_asleep_per_guard, e->guard_id, &ret);
                 if (ret == 0)
-                    kh_value(minutes_asleep_per_guard, k) += asleep_duration;
+                    kh_value(minutes_asleep_per_guard, k) +=
+                        asleep_duration_minute;
                 else
-                    kh_value(minutes_asleep_per_guard, k) = asleep_duration;
+                    kh_value(minutes_asleep_per_guard, k) =
+                        asleep_duration_minute;
             }
         }
     }
 
-    uint64_t max_guard_id = 0;
-    uint64_t max_asleep = 0;
+    uint64_t guard_longest_asleep = 0;
+    uint64_t guard_max_asleep_duration_minute = 0;
     {
         uint64_t guard_id = 0;
-        uint64_t asleep_duration = 0;
-        kh_foreach(minutes_asleep_per_guard, guard_id, asleep_duration, {
-            if (max_asleep < asleep_duration) {
-                max_asleep = asleep_duration;
-                max_guard_id = guard_id;
+        uint64_t asleep_duration_minute = 0;
+        kh_foreach(minutes_asleep_per_guard, guard_id, asleep_duration_minute, {
+            if (guard_max_asleep_duration_minute < asleep_duration_minute) {
+                guard_max_asleep_duration_minute = asleep_duration_minute;
+                guard_longest_asleep = guard_id;
             }
         });
     }
-    printf("Longest asleep: Guard id=%llu, sleep duration=%llu m\n",
-           max_guard_id, max_asleep);
+    printf(
+        "guard_longest_asleep_id %llu\nguard_longest_asleep_duration_minute "
+        "%llu\n",
+        guard_longest_asleep, guard_max_asleep_duration_minute);
 
-    uint64_t sleep_minute_count[60];
-    bzero(sleep_minute_count, sizeof(sleep_minute_count));
+    uint64_t sleep_minute_count[60] = {0};
     {
         time_t fall_asleep_timestamp = 0;
         for (size_t i = 0; i < kv_size(events); i++) {
             struct event* e = &kv_A(events, i);
-            if (e->guard_id == max_guard_id) {
+            if (e->guard_id == guard_longest_asleep) {
                 if (e->event_type == FALL_ASLEEP)
                     fall_asleep_timestamp = e->time;
                 else if (e->event_type == WAKE_UP) {
@@ -184,72 +164,28 @@ int main() {
         }
     }
 
-    uint8_t min_minute = 0;
-    uint8_t min_minute_count = 0;
+    uint8_t minute_most_frequent_asleep_for_guard_most_asleep = 0;
+    uint8_t minute_most_frequent_asleep_for_guard_count = 0;
     for (uint8_t i = 0; i < 60; i++) {
+#ifdef DEBUG
         printf("%hhu: %llu\n", i, sleep_minute_count[i]);
-        if (min_minute_count < sleep_minute_count[i]) {
-            min_minute_count = sleep_minute_count[i];
-            min_minute = i;
+#endif
+        if (minute_most_frequent_asleep_for_guard_count <
+            sleep_minute_count[i]) {
+            minute_most_frequent_asleep_for_guard_count = sleep_minute_count[i];
+            minute_most_frequent_asleep_for_guard_most_asleep = i;
         }
     }
 
-    printf("Most frequent asleep: minute=%d, count=%hhu\n", min_minute,
-           min_minute_count);
+    printf(
+        "minute_most_frequent_asleep_for_guard_most_asleep "
+        "%d\nminute_most_frequent_asleep_for_guard_count %hhu\npart_one_hash "
+        "%llu\n",
+        minute_most_frequent_asleep_for_guard_most_asleep,
+        minute_most_frequent_asleep_for_guard_count,
+        guard_longest_asleep *
+            minute_most_frequent_asleep_for_guard_most_asleep);
 
-    {
-        kvec_t(struct sleep_stat) sleep_stats = {0};
-
-        time_t fall_asleep_timestamp = 0;
-        for (size_t i = 0; i < kv_size(events); i++) {
-            struct event* e = &kv_A(events, i);
-
-            if (e->event_type == FALL_ASLEEP)
-                fall_asleep_timestamp = e->time;
-            else if (e->event_type == WAKE_UP) {
-                uint64_t minutes_asleep =
-                    difftime(e->time, fall_asleep_timestamp) / 60;
-
-                struct sleep_stat s = {
-                    .guard_id = e->guard_id,
-                    .minutes_asleep = minutes_asleep,
-                    .fall_asleep_timestamp = fall_asleep_timestamp,
-                    .wake_up_timestamp = e->time,
-                    .fall_asleep_minute =
-                        gmtime(&fall_asleep_timestamp)->tm_min,
-                    .wake_up_minute = gmtime(&e->time)->tm_min};
-
-                kv_push(struct sleep_stat, sleep_stats, s);
-
-                fall_asleep_timestamp = 0;
-            }
-        }
-
-        kvec_t(uint64_t) guard_ids = {0};
-
-        uint64_t guard_most_asleep_id = 0;
-        uint64_t most_asleep_minutes = 0;
-        printf("Longest asleep: Guard id=%llu, sleep duration=%llu m\n",
-               guard_most_asleep_id, most_asleep_minutes);
-
-        uint64_t sleep_minute_count[60];
-        bzero(sleep_minute_count, sizeof(sleep_minute_count));
-
-        for (uint64_t i = 0; i < kv_size(sleep_stats); i++) {
-            struct sleep_stat* s = &kv_A(sleep_stats, i);
-
-            for (uint64_t m = 0;
-                 s->guard_id == guard_most_asleep_id && m < s->minutes_asleep;
-                 m++)
-                sleep_minute_count[(s->fall_asleep_minute + m) % 60] += 1;
-        }
-
-        for (uint8_t i = 0; i < 60; i++)
-            printf("%hhu: %llu\n", i, sleep_minute_count[i]);
-
-        uint8_t minute = 0;
-        uint64_t count = 0;
-        ARR_OPTIMUM(sleep_minute_count, 60, count, minute, >);
-        printf("Minute: %hhu, count: %llu\n", minute, count);
-    }
+    // Part two
+    {}
 }

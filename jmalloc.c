@@ -1,12 +1,18 @@
 // cc % -ljemalloc && ./a.out 100
 // Prints stats with jemalloc
 #include <errno.h>
+#ifdef __FreeBSD__
+#include <malloc_np.h>
+#else
 #include <jemalloc/jemalloc.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 int main(int argc, char* argv[]) {
+    if (argc != 2) return 1;
+
     size_t count = strtoll(argv[1], NULL, 10);
 
     size_t* numbers = malloc(count * sizeof(size_t));
@@ -15,9 +21,13 @@ int main(int argc, char* argv[]) {
         exit(errno);
     }
     for (size_t i = 0; i < count; i++) numbers[i] = rand();
-    printf("%zu\n", numbers[count - 1]);
 
+    size_t epoch = 1;
+    size_t size = sizeof(size_t);
     {
+        // Comment out this line to disable bypassing caching
+        // mallctl("epoch", NULL, NULL, &epoch, size);
+
         size_t allocated = 0;
         size_t allocated_len = sizeof(allocated);
         mallctl("stats.allocated", &allocated, &allocated_len, NULL, 0);
@@ -47,9 +57,12 @@ int main(int argc, char* argv[]) {
     size_t new_count = count * 2;
     numbers = realloc(numbers, new_count * sizeof(size_t));
     for (size_t i = 0; i < new_count; i++) numbers[i] = rand();
-    printf("%zu %zu\n", numbers[count - 1], numbers[new_count - 1]);
 
     {
+        epoch += 1;
+        // Comment out this line to disable bypassing caching
+        //   mallctl("epoch", &epoch, &size, &epoch, size);
+
         size_t allocated = 0;
         size_t allocated_len = sizeof(allocated);
         mallctl("stats.allocated", &allocated, &allocated_len, NULL, 0);

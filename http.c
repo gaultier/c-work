@@ -1,11 +1,11 @@
 #include <assert.h>
 #include <mysql/mysql.h>
-#include <sds.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sds.c>
+#include "sds.c"
+#include "sds.h"
 
 #include "ae.h"
 #include "anet.h"
