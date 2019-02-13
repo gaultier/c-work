@@ -26,7 +26,10 @@ static int event_cmp_timestamp(const void* a, const void* b) {
         return 0;
 }
 
+typedef kvec_t(uint8_t) vec;
+
 KHASH_MAP_INIT_INT(hash, uint64_t)
+KHASH_MAP_INIT_INT(hash2, vec)
 
 int main() {
     kvec_t(struct event) events;
@@ -187,5 +190,41 @@ int main() {
             minute_most_frequent_asleep_for_guard_most_asleep);
 
     // Part two
-    {}
+    {
+        khash_t(hash2)* minutes_asleep_per_guard = kh_init(hash2);
+        khiter_t k;
+        time_t fall_asleep_timestamp = 0;
+        for (size_t i = 0; i < kv_size(events); i++) {
+            struct event* e = &kv_A(events, i);
+            if (e->event_type == FALL_ASLEEP)
+                fall_asleep_timestamp = e->time;
+            else if (e->event_type == WAKE_UP) {
+                struct tm wake_up_time = {0};
+                gmtime_r(&e->time, &wake_up_time);
+                int wake_up_minute = wake_up_time.tm_min;
+
+                struct tm fall_asleep_time = {0};
+                gmtime_r(&fall_asleep_timestamp, &fall_asleep_time);
+                int fall_asleep_minute = fall_asleep_time.tm_min;
+
+                uint64_t diff = difftime(e->time, fall_asleep_timestamp) / 60;
+
+                for (uint8_t minute = fall_asleep_minute;
+                     minute < (fall_asleep_minute % 60); minute++) {
+                    int ret;
+                    k = kh_get(hash2, minutes_asleep_per_guard, e->guard_id);
+                    int is_missing = (k == kh_end(minutes_asleep_per_guard));
+                    if (is_missing) {
+                        vec minutes = {0};
+                        k = kh_put(hash2, minutes_asleep_per_guard, e->guard_id,
+                                   &ret);
+                    }
+                    vec* minutes = &kh_value(minutes_asleep_per_guard, k);
+                    kv_push(uint8_t, *minutes, minute);
+                }
+
+                fall_asleep_timestamp = 0;
+            }
+        }
+    }
 }
