@@ -25,8 +25,7 @@ int main(int argc, char* argv[]) {
     size_t epoch = 1;
     size_t size = sizeof(size_t);
     {
-        // Comment out this line to disable bypassing caching
-        // mallctl("epoch", NULL, NULL, &epoch, size);
+        mallctl("epoch", NULL, NULL, &epoch, size);
 
         size_t allocated = 0;
         size_t allocated_len = sizeof(allocated);
@@ -60,8 +59,7 @@ int main(int argc, char* argv[]) {
 
     {
         epoch += 1;
-        // Comment out this line to disable bypassing caching
-        //   mallctl("epoch", &epoch, &size, &epoch, size);
+        mallctl("epoch", &epoch, &size, &epoch, size);
 
         size_t allocated = 0;
         size_t allocated_len = sizeof(allocated);
