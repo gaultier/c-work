@@ -25,7 +25,8 @@ int main(int argc, char* argv[]) {
     size_t epoch = 1;
     size_t size = sizeof(size_t);
     {
-        mallctl("epoch", NULL, NULL, &epoch, size);
+        mallctl("epoch", &epoch, &size, &epoch, size);
+        printf("Epoch: %zu\n", epoch);
 
         size_t allocated = 0;
         size_t allocated_len = sizeof(allocated);
@@ -58,8 +59,8 @@ int main(int argc, char* argv[]) {
     for (size_t i = 0; i < new_count; i++) numbers[i] = rand();
 
     {
-        epoch += 1;
         mallctl("epoch", &epoch, &size, &epoch, size);
+        printf("Epoch: %zu\n", epoch);
 
         size_t allocated = 0;
         size_t allocated_len = sizeof(allocated);
