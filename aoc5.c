@@ -1,3 +1,4 @@
+// cc -std=c99 -O2 -Weverything -std=c99 % && ./a.out
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
