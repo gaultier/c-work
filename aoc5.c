@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* tmp = NULL;
-size_t tmp_size = 0;
+static char* tmp = NULL;
+static size_t tmp_size = 0;
 
-void memcpy_without_sub_in_place(char* src, size_t* src_size, size_t sub_i,
-                                 size_t sub_size) {
+static void memcpy_without_sub_in_place(char* src, size_t* src_size,
+                                        size_t sub_i, size_t sub_size) {
         tmp_size = *src_size - sub_size;
 
         memcpy(tmp, src, sub_i);
@@ -23,7 +23,7 @@ void memcpy_without_sub_in_place(char* src, size_t* src_size, size_t sub_i,
 int main() {
         FILE* const f = fopen("/Users/pgaultier/Downloads/aoc5.txt", "r");
         fseek(f, 0, SEEK_END);
-        size_t string_size = ftell(f);
+        size_t string_size = (size_t)ftell(f);
         fseek(f, 0, SEEK_SET);
 
         char* const string = calloc(string_size + 1, 1);
