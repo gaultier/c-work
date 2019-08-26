@@ -3,17 +3,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* memcpy_without_sub(size_t* dst_size, char* src, size_t src_size,
-                         size_t sub_i, size_t sub_size) {
-        const size_t new_size = src_size - sub_size;
-        char* dst = calloc(*dst_size, 1);
+char* tmp = NULL;
+size_t tmp_size = 0;
 
-        memcpy(dst, src, sub_i);
-        memcpy(dst + sub_i, src + sub_i + sub_size,
-               src_size - (sub_i + sub_size));
+void memcpy_without_sub_in_place(char* src, size_t* src_size, size_t sub_i,
+                                 size_t sub_size) {
+        tmp_size = *src_size - sub_size;
 
-        *dst_size = new_size;
-        return dst;
+        memcpy(tmp, src, sub_i);
+        memcpy(tmp + sub_i, src + sub_i + sub_size,
+               *src_size - (sub_i + sub_size));
+        memset(tmp + tmp_size, 0, *src_size - tmp_size);
+
+        memcpy(src, tmp, tmp_size);
+        memset(src + tmp_size, 0, *src_size - tmp_size);
+        *src_size = tmp_size;
 }
 
 int main() {
@@ -29,43 +33,28 @@ int main() {
 
         string[string_size] = 0;
         size_t i = string_size - 1;
+        // 'Remove' trailing whitespace
         while (string[i] == ' ' || string[i] == '\n' || string[i] == '\t') {
                 string[i] = 0;
                 string_size--;
                 i--;
         }
+        tmp = malloc(string_size);
+        tmp_size = string_size;
+        memcpy(tmp, string, string_size);
 
-        printf("[D001] size=%ld\n", string_size);
-
-        /* char src[] = {0, 1, 2, 3, 4, 5, 6}; */
-        /* size_t src_size = sizeof(src); */
-        /* memcpy_without_sub(&dst, &dst_size, src, src_size, 4, 2); */
-        /* for (size_t i = 0; i < dst_size; i++) printf("%d\n", dst[i]); */
-
-        for (size_t n = 0; n < string_size; n++) {
-                size_t i = 0;
-                while (i < string_size) {
-                        const char a = string[i];
-                        const char b = string[i + 1];
-                        if (abs(a - b) == 32) {
-                                string = memcpy_without_sub(
-                                    &string_size, string, string_size, i, 2);
-                                i = 0;
-                                continue;
-                        }
-                        i++;
-                }
-        }
-
-        for (size_t i = 0; i < string_size - 1; i++) {
+        i = 0;
+        while (i < string_size) {
                 const char a = string[i];
                 const char b = string[i + 1];
                 if (abs(a - b) == 32) {
-                        printf("Precondition failed: s[%zu]=%c s[%zu]=%c\n", i,
-                               a, i + 1, b);
-                        return 1;
+                        memcpy_without_sub_in_place(string, &string_size, i, 2);
+                        i = 0;
+                        continue;
                 }
+                i++;
         }
+
         printf("`%s`\n", string);
         printf("`%zu`\n", string_size);
 }
