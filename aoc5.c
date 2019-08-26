@@ -21,12 +21,12 @@ void memcpy_without_sub_in_place(char* src, size_t* src_size, size_t sub_i,
 }
 
 int main() {
-        FILE* f = fopen("/Users/pgaultier/Downloads/aoc5.txt", "r");
+        FILE* const f = fopen("/Users/pgaultier/Downloads/aoc5.txt", "r");
         fseek(f, 0, SEEK_END);
         size_t string_size = ftell(f);
         fseek(f, 0, SEEK_SET);
 
-        char* string = calloc(string_size + 1, 1);
+        char* const string = calloc(string_size + 1, 1);
 
         fread(string, 1, string_size, f);
         fclose(f);
