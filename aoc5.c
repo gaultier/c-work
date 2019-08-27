@@ -46,16 +46,12 @@ int main() {
 
         i = 0;
         while (i < string_size) {
-                const char a = string[i];
-                const char b = string[i + 1];
-                if (abs(a - b) == 32) {
+                if (abs(string[i] - string[i + 1]) == 32) {
                         memcpy_without_sub_in_place(string, &string_size, i, 2);
-                        i = 0;
-                        continue;
-                }
-                i++;
+                        i = i > 0 ? i - 1 : 0;
+                } else
+                        i++;
         }
 
-        printf("`%s`\n", string);
         printf("`%zu`\n", string_size);
 }
