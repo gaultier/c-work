@@ -1,5 +1,4 @@
 // cc -std=c99 -O3 -Weverything -std=c99 % && ./a.out
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
