@@ -4,23 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char* tmp = NULL;
-static size_t tmp_size = 0;
-
-static void memcpy_without_sub_in_place(char* src, size_t* src_size,
-                                        size_t sub_i, size_t sub_size) {
-        tmp_size = *src_size - sub_size;
-
-        memcpy(tmp, src, sub_i);
-        memcpy(tmp + sub_i, src + sub_i + sub_size,
-               *src_size - (sub_i + sub_size));
-        memset(tmp + tmp_size, 0, *src_size - tmp_size);
-
-        memcpy(src, tmp, tmp_size);
-        memset(src + tmp_size, 0, *src_size - tmp_size);
-        *src_size = tmp_size;
-}
-
 int main() {
         FILE* const f = fopen("/Users/pgaultier/Downloads/aoc5.txt", "r");
         fseek(f, 0, SEEK_END);
@@ -33,25 +16,17 @@ int main() {
         fclose(f);
 
         string[string_size] = 0;
-        size_t i = string_size - 1;
-        // 'Remove' trailing whitespace
-        while (string[i] == ' ' || string[i] == '\n' || string[i] == '\t') {
-                string[i] = 0;
-                string_size--;
-                i--;
-        }
-        tmp = malloc(string_size);
-        tmp_size = string_size;
-        memcpy(tmp, string, string_size);
 
-        i = 0;
+        size_t i = 0;
         while (i < string_size) {
                 if (abs(string[i] - string[i + 1]) == 32) {
-                        memcpy_without_sub_in_place(string, &string_size, i, 2);
+                        memmove(string + i, string + i + 2,
+                                string_size - i - 2);
+                        string_size -= 2;
                         i = i > 0 ? i - 1 : 0;
                 } else
                         i++;
         }
 
-        printf("`%zu`\n", string_size);
+        printf("`%zu`\n", string_size - 1);
 }
